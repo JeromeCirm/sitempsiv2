@@ -22,19 +22,19 @@
 </div>
 <div>
     <BR>
-<div class="textedinfo"> 
+<div class="textedinfo"> {% if prenom %}
     <p>    
         <label for="prenom"> Prénom usuel : </label>
         <input type="text" id="prenom" name="prenom" value="{{ prenom }}">
-      </p>
+      </p> {% endif %} {% if nom %}
       <p>    
         <label for="nom"> Nom usuel : </label>
         <input type="text" id="nom" name="nom" value="{{ nom }}">
-      </p>
+      </p> {% endif %} {% if mail %}
     <p>
     <label for="mail"> Mail : </label>
     <input type="email" id="mail" name="mail" value="{{ mail }}">
-    </p>
+    </p> {% endif %} 
     {{ donnees.as_p }}
 </div>
 </div>

@@ -187,7 +187,7 @@ def importation_fiches_eleves(context,efface=False,remplace_officiel=True,impose
     # importe à partir du répertoire private_files/transfert_fiche
     # login_annee_json pour le fichier contenant le json du dictionnaire à mettre dans Renseignements
     # login_annee.pdf pour un fichier pdf à mettre en plus de la fiche élève
-    # si le fichier pdf est déjà présent : on efface ou non l'ancien selon l'argument
+    # si le fichier pdf est déjà présent : on efface ou non l'ancien selon l'argument "efface"
     # remplace_officiel décide si on remplace les champs prénom/nom officiel par ceux de l'import, s'ils existent
     # utile pour mettre à False si ces champs ont déjà été remplis
     # impose_usuel décide si on utilise le prénom/nom officiel comme prénom/nom d'usage (first_name/last_name de user)

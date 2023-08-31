@@ -12,13 +12,13 @@ from gestionmenu.initialisation import *
 # value : le texte affiché dans le menu d'initialisation
 liste_initialisation={
     "init_complete_perso" : 'reinitialisation complète du site (avec les données persos)',
-    "init_menu" : 'reinitialisation des menus du site',
-    "creation_semaines" : 'création des semaines',
     "creation_comptes_prof" : 'création des comptes profs ',
     "creation_comptes_eleves" : 'reinitialisation des comptes élèves',
     "creation_comptes_colleurs" : 'reinitialisation des comptes colleurs (hors profs)',
     "creation_groupes_creneaux_colloscope" : 'création groupes de colles, créneaux de colles et colloscope',
     "creation_colloscope_philo" : 'création des créneaux de colles de philo et gestion du dico colles-persos',
+    "init_menu" : 'reinitialisation des menus du site',
+    "creation_semaines" : 'création des semaines',
     "importation_des_fiches_eleves" : 'Importation des fiches élèves',
     "importation_des_fiches_renseignements" : 'Importation des fiches renseignements élèves'}
 
@@ -36,15 +36,20 @@ liste_menu=[
         ["Trombinoscope","fichier_unique",["prof_math"],["eleves","profs","generic","math","physique","anglais","philo"]],
         ["Liste des mails","contacts",["prof_math"],["eleves","profs","math","physique","anglais","philo"]],
         ["Emploi du temps","fichier_unique",["prof_math"],["eleves","profs","generic","math","physique","anglais","philo"]],
+        ["Partage de fichiers","liste_fichiers",["prof_math","prof_anglais","prof_philo","prof_physique","prof_info","prof_si"],["profs"]],
         ]],
     ["Anglais","",["prof_anglais"],["eleves","profs","generic"],[
-    ]],          
+    ]],     
+    ["Informatique",["prof_info"],["eleves","profs","generic"],[
+        ["Python-navigateur","lienhttps://console.basthon.fr/",["prof_info"],["eleves","profs","generic"]],         
+    ]],     
     ["Math","",["prof_math"],["eleves","profs","generic","math"],[
         ["Cours de math","liste_fichiers",["prof_math"],["eleves","profs","generic","math"]],
         ["Documents de math","liste_fichiers",["prof_math"],["eleves","profs","generic"]],
         ["Programme de colle de math","programme_colle",["prof_math"],["eleves","profs","generic","math"]],
     ]],
     ["Philosophie","",["prof_philo"],["eleves","profs","generic"],[
+        ["Documents de philo","liste_fichiers",["prof_philo"],["eleves","profs","generic"]],
         ["S'inscrire en colle de philo","inscription_colles_philo",["prof_philo"],["eleves"]],
         ["Gestion des colles de philo","gestion_colles_philo",["prof_philo"],[]],
     ]],  

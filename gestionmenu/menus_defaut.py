@@ -211,10 +211,6 @@ def lire_fiches_eleves(request,id_menu,context):
                     context["mail"]=user.email
                 except:
                     debug("utilisateur absent pour l'année courante")
-            else:
-                context["prenom"]=eleve.prenomofficiel
-                context["nom"]=eleve.nomofficiel
-                context["mail"]=""  # mail non gardé en base de données pour les anciens élèves
             if context["gestionnaire"]:
                 context["lesfichiers"]=FichierFiches.objects.filter(fiche=eleve)
         except:

@@ -13,4 +13,4 @@ my_annee_courante=2023
 
 # la liste des personnes ayant le droit d'ajouter
 # et lire des fichiers pdf aux fiches élèves.
-my_gestionnaires_pdf=["nizon","bouissou"]
+my_gestionnaires_pdf=["prof_math","prof_physique"]

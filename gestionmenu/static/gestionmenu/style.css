@@ -72,7 +72,7 @@ color: rgb(213, 229, 242); /* bleu clair */
 }
 
 /* partie pour téléphone mobile */
-@media only screen and (max-width: 740px) {
+@media only screen and (max-width: 1000px) {
   h1 {
     font-size: 16px;
     text-shadow: -1px -1px #0c0, 1px 1px #060, -3px 0 4px #000;
@@ -381,7 +381,7 @@ background:#CFFF6A;
   display : none;
 }
 
-@media screen and (min-width: 980px){
+@media screen and (min-width: 1000px){
 .pasmobile {
   display : inline;
 }
@@ -509,7 +509,8 @@ width: 20%;
 }
 
 /* partie pour téléphone mobile */
-@media only screen and (max-width: 740px) {
+/* 740 -> 1000 */
+@media only screen and (max-width: 1000px) {
 
 .textedinfo{
 padding: 5px;
