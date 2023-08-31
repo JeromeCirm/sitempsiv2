@@ -40,7 +40,7 @@ liste_menu=[
         ]],
     ["Anglais","",["prof_anglais"],["eleves","profs","generic"],[
     ]],     
-    ["Informatique",["prof_info"],["eleves","profs","generic"],[
+    ["Informatique","",["prof_info"],["eleves","profs","generic"],[
         ["Python-navigateur","lienhttps://console.basthon.fr/",["prof_info"],["eleves","profs","generic"]],         
     ]],     
     ["Math","",["prof_math"],["eleves","profs","generic","math"],[
