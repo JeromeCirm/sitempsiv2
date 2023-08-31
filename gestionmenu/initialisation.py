@@ -199,7 +199,7 @@ def importation_fiches_eleves(context,efface=False,remplace_officiel=True,impose
         return 
     for name in listefichier:
         if len(name)>=10:
-            login=name[:-9]
+            login=name[:-9].lower()
             annee=name[-8:-4]
             ext=name[-4:]
         else:
