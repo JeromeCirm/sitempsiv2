@@ -6,11 +6,11 @@ MY_SECRET_KEY = 'django-insecure-$sp&6x*kkoimrhn$dy*a=&_p^5k7hd$$0&74z0hby1ibzmg
 # Passer Debug à False pour l'utilisation réelle
 MY_DEBUG = True
 # l'url du site, sans https ni www
-MY_ALLOWED_HOSTS = ['127.0.0.1']
+MY_ALLOWED_HOSTS = ['127.0.0.1']  # (pour une version en local)
 # l'adresse sur le serveur ou sont rangés les fichiers "static"
 # qui seront livrés par apache et non django
 # sans doute quelquechose comme   "/home/nomcompte/nomdusite/static"
-MY_STATIC_ROOT = 'C:/Users/jerome/Documents/GitHub/sitempsi_v2/static'
+MY_STATIC_ROOT = ''
 
 # mettre les trois à "True" pour l'utilisation réelle
 MY_SECURE_SSL_REDIRECT = False

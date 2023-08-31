@@ -64,10 +64,7 @@ class RenseignementsFormProf(ModelForm):
     class Meta:
         model=Renseignements
         fields = '__all__'
-        labels= {
-            "nomusage" : "Nom d'usage",
-            "prenomusage" : "Prénom d'usage",
-            "naissance" : "Date de naissance",
+        labels= { 
             "tempstrajet" : "Temps de trajet Lycée-domicile (aller)",
             "seullogement" : "Es-tu seul(e) dans ton logement ?",
             "motivationprepa" : "Pourquoi avoir choisi MPSI?",
@@ -80,10 +77,14 @@ class RenseignementsFormProf(ModelForm):
             "connexioninternet" : "as-tu possibilité de te connecter régulièrement à internet ?"
         }
         exclude=('login','année')
+        #widgets = { # rappel de syntaxe si on veut la date de naissance
+        #    'naissance': forms.DateInput(attrs={'type': 'date','class': 'datepicker'})
+        #}
 
 # Ici, même chose mais en excluant les champs que l'élève ne doit pas modifié
 # on ne met pas nomusage/prénomusage : c'est géré avec settings
 
 class RenseignementsForm(RenseignementsFormProf):
     class Meta(RenseignementsFormProf.Meta):
-         exclude=('login','année','prenomofficiel','nomofficiel','rne_lycee','lycee_officiel','ville_officiel','departement_officiel')
+         exclude=('login','année','prenomofficiel','nomofficiel','date_naissance_officiel','rne_lycee',
+                  'lycee_officiel','ville_officiel','departement_officiel')

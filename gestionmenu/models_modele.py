@@ -153,13 +153,7 @@ class Renseignements(models.Model):
     # les 4 premiers sont indispensables pour le site : ne pas effacer
     login=models.CharField(max_length=50)
     année=models.IntegerField(null=True,blank=True)
-    # pour les deux qui suivent, indispensables aussi : 
-    # la présence dans le formulaire est décider par le fichier settings
-    # et la variable autoriser_changement_nom
-    prenomusage=models.CharField(max_length=50,null=True,blank=True,default="")
-    nomusage=models.CharField(max_length=50,null=True,blank=True,default="")
     # les champs que l'élève peut modifier, dans l'ordre d'apparition dans le formulaire
-    naissance=models.DateField(null=True,blank=True)
     seullogement=models.BooleanField(null=True,blank=True)
     motivationprepa=models.TextField(null=True,blank=True)
     lyceeorigine=models.CharField(max_length=50,null=True,blank=True)
@@ -182,6 +176,7 @@ class Renseignements(models.Model):
     # modifier la fonction si on les enlève
     prenomofficiel=models.CharField(max_length=50,null=True,blank=True)
     nomofficiel=models.CharField(max_length=50,null=True,blank=True)
+    date_naissance_officiel=models.DateField(blank=True,null=True)
     rne_lycee=models.CharField(max_length=50,null=True,blank=True)
     lycee_officiel=models.CharField(max_length=50,null=True,blank=True)
     ville_officiel=models.CharField(max_length=50,null=True,blank=True)
