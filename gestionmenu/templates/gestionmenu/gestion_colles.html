@@ -1,0 +1,243 @@
+{% extends 'gestionmenu/base.html' %}
+{% load gestionmenutags %}
+
+{% block body %}
+
+<h1> Gestion des créneaux de colles </h1>
+<hr>
+<br><br>
+<div style="text-align:center">
+    <form method="POST" id="form" action="">
+        {% csrf_token %}
+        <label> Semaine : </label>
+        <select id="semaine"  name="semaine" onchange="affiche_colles('groupe')" ="select">
+            {% for item in lessemaines %}
+            <option value="{{ item.numero }}" {% if item.numero == semaine.numero %}selected="selected"{% endif %}>n°- {{ item.numero }} commençant le {{ item.date }}</option> {% endfor %}
+        </select> 
+
+        <label> Créneau : </label>
+        <select id="creneau" name="creneau" type="select"> </select>
+    </form> <br>
+    
+    <button onclick="creation_creneau_groupe()" action=""> Création du créneau </button> pour le groupe : 
+    <select id="groupe" name="groupe" type="select">
+        {% for item in lesgroupes %}
+    <option value="{{ item.numero }}" > {{ item.numero }} </option> {% endfor %}
+    </select>   <br><br>
+
+    <button onclick="creation_creneau_eleve()" action=""> Création du créneau  pour l'élève : </button>
+    <select id="eleve" name="eleve" type="select">
+        {% for item in leseleves %}
+    <option value="{{ item.id }}" > {{ item.first_name }} {{ item.last_name }} </option> {% endfor %}
+    </select>    <br>
+    <span id="message"></span><br>
+</div>
+
+<div style="text-align:center">  <BR>
+<div id="titre_semaine"></div>
+<div style="padding : 10px;display:inline-block;text-align:left" id="indic_semaine"> </div>
+</div>
+
+<style>
+    select {
+        margin : 5px;
+    }
+</style>
+    
+<script>
+let semaine=document.getElementById("semaine")
+let groupe=document.getElementById("groupe")
+let creneau=document.getElementById("creneau")
+let eleve=document.getElementById("eleve")
+let form=document.getElementById("form")
+let message=document.getElementById("message")
+let titre_semaine=document.getElementById("titre_semaine")
+let indic_semaine=document.getElementById("indic_semaine")
+let lessemaines=""
+    
+function maj_creneau() {
+            var formData = new FormData();
+            formData.append('fonction', 'creneaux');
+            csrf=document.getElementsByName('csrfmiddlewaretoken')[0]
+            formData.append('csrfmiddlewaretoken',csrf.value)
+            fetch("/recuperation_creneaux", {
+              method : 'POST',
+              headers : {
+                'Accept': 'application/json, text/plain, */*',
+                },
+                body: formData
+            }).then(function(res){ return res.json();})
+              .then(function(res){
+                affiche_creneaux(res["creneaux"])
+                lessemaines=res["semaines"]
+                affiche_colles()
+            })
+                .catch(function(err){ console.log('Erreur requête', err);});
+        }
+        
+function affiche_creneaux(creneaux) {
+    /* ordonner les élèves par usename */
+    creneau.innerHTML=""
+    for (x in creneaux) {
+        item=creneaux[x]
+        let option=document.createElement('option')
+        option.setAttribute('value',item.id)
+        option.innerHTML=item.text
+        creneau.appendChild(option)
+    }
+}
+
+function affiche_colles(type) { 
+    titre_semaine.innerHTML="Informations pour la semaine numéro "+semaine.value
+    informations=lessemaines[semaine.value]
+        indic_semaine.innerHTML=""
+        indic_semaine.appendChild(document.createElement('BR'))
+        var l=["lundi","mardi","mercredi","jeudi","vendredi","samedi"]
+        l.forEach(function(key) {
+            if (informations[key].length!=0) {
+                var item=document.createElement('input')
+                item.value=key
+                item.disabled
+                // item.size=7
+                item.setAttribute('class','inputmobilemarc5')
+                indic_semaine.appendChild(item)
+                informations[key].forEach(function (u) {
+                    var item=document.createElement('button')
+                    item.innerHTML="X"
+                    // item.width="25px"  // 30px ou 25px
+                    item.setAttribute('class','inputmobilemarc25')
+                    item.setAttribute('onclick',"supprimer_creneau("+(u[5])+",'"+u[6]+"')")
+                    indic_semaine.appendChild(item)
+
+                    var item=document.createElement('input')
+                    item.value=u[0]+" avec "+u[1]+" à "+u[2]+" en "+u[3]+" ("+u[4]+")"
+                    item.disabled
+                    //item.size=100
+                    item.setAttribute('class','inputmobilemarc4')
+                    indic_semaine.appendChild(item)
+                    var item=document.createElement('input')
+                    indic_semaine.appendChild(document.createElement("br"))
+                    item.value=""
+                    item.disabled
+                    // item.size=7
+                    item.setAttribute('class','inputmobilemarc5')
+                    indic_semaine.appendChild(item)
+                })
+                var item=document.createElement('input')
+                item.value=""
+                item.disabled
+                //item.size=100+25
+                item.setAttribute('class','inputmobilemarc4bis')
+                indic_semaine.appendChild(item)
+                indic_semaine.appendChild(document.createElement("br"))
+            }
+        } )
+        if (informations["autre_jour"].length!=0) {
+                var item=document.createElement('input')
+                item.value="autre"
+                item.disabled
+                item.size=7
+                indic_semaine.appendChild(item)
+                informations["autre_jour"].forEach(function (u) {
+                    var item=document.createElement('button')
+                    item.innerHTML="X"
+                    item.setAttribute('onclick',"supprimer_creneau("+(u[6])+",'"+u[7]+"')")
+                    indic_semaine.appendChild(item)
+                    var item=document.createElement('input')
+                    item.value=u[0]+" avec "+u[1]+" à "+u[2]+" en "+u[3]+" ("+u[4]+" "+u[5]+")"
+                    item.disabled
+                    item.size=100
+                    indic_semaine.appendChild(item)
+                    var item=document.createElement('input')
+                    indic_semaine.appendChild(document.createElement("br"))
+                    item.value=""
+                    item.disabled
+                    item.size=7
+                    indic_semaine.appendChild(item)
+                })
+                var item=document.createElement('input')
+                item.value=""
+                item.disabled
+                item.size=100
+                indic_semaine.appendChild(item)
+                indic_semaine.appendChild(document.createElement("br"))
+            }
+}
+
+function affiche_message(msg) {
+    message.innerHTML=msg
+}
+
+function creation_creneau_groupe() {
+    var formData = new FormData();
+    formData.append('semaine', semaine.value);
+    formData.append('creneau', creneau.value);
+    formData.append('groupe', groupe.value);
+    csrf=document.getElementsByName('csrfmiddlewaretoken')[0]
+    formData.append('csrfmiddlewaretoken',csrf.value)
+    fetch("/creation_creneaux_groupe", {
+              method : 'POST',
+              headers : {
+                'Accept': 'application/json, text/plain, */*',
+                },
+                body: formData
+            }).then(function(res){ return res.json();})
+              .then(function(res){
+                affiche_message(res["msg"])
+                affiche_creneaux(res["creneaux"])
+                lessemaines=res["semaines"]
+                affiche_colles()
+               })
+                .catch(function(err){ console.log('Erreur requête', err);});
+}
+    
+function creation_creneau_eleve() {
+    var formData = new FormData();
+    formData.append('semaine', semaine.value);
+    formData.append('creneau', creneau.value);
+    formData.append('eleve', eleve.value);
+    csrf=document.getElementsByName('csrfmiddlewaretoken')[0]
+    formData.append('csrfmiddlewaretoken',csrf.value)
+    fetch("/creation_creneaux_eleve", {
+              method : 'POST',
+              headers : {
+                'Accept': 'application/json, text/plain, */*',
+                },
+                body: formData
+            }).then(function(res){ return res.json();})
+              .then(function(res){
+                affiche_message(res["msg"])
+                affiche_creneaux(res["creneaux"])
+                lessemaines=res["semaines"]
+                affiche_colles()
+               })
+                .catch(function(err){ console.log('Erreur requête', err);});
+}
+
+function supprimer_creneau(id,type) {
+    var formData = new FormData();
+    formData.append('colle', id);
+    formData.append('type', type);
+    csrf=document.getElementsByName('csrfmiddlewaretoken')[0]
+    formData.append('csrfmiddlewaretoken',csrf.value)
+    fetch("/suppression_creneaux_groupe", {
+              method : 'POST',
+              headers : {
+                'Accept': 'application/json, text/plain, */*',
+                },
+                body: formData
+            }).then(function(res){ return res.json();})
+              .then(function(res){
+                affiche_message(res["msg"])
+                affiche_creneaux(res["creneaux"])
+                lessemaines=res["semaines"]
+                affiche_colles()
+               })
+                .catch(function(err){ console.log('Erreur requête', err);});
+}
+
+maj_creneau()
+</script>
+
+
+{% endblock body %}

@@ -1,0 +1,252 @@
+body{
+  background-color : #6fb8b9;
+  font-family: Avenir, sans-serif;
+}
+
+.green {
+  background-color : green;
+}
+
+.blue {
+  background-color : #2687c9;
+}
+
+.red {
+  background-color : red;
+}
+
+.darkblue {
+  background-color : #2020c9;
+}
+
+.orange {
+  background-color : #FAB315;
+}
+
+.cwhite {
+  color : white;
+}
+
+.cblack {
+  color : black;
+}
+
+.cred {
+  color : red;
+}
+
+.pointer {
+  cursor : pointer;
+}
+
+.center {
+  text-align : center;
+}
+
+/*  Style du bandereau de menu */
+
+nav.menu {
+  background-color: rgb(38, 135, 201);
+}
+
+.menu ul {
+  list-style: none;
+  padding : 0px;
+  padding-top: 5px;
+  padding-bottom : 5px;
+  margin : 0px;
+  margin-top: 5px;
+  margin-bottom : 5px;
+}
+
+.menuli {
+  /*padding: -5px -10px;*/
+  line-height: 1.5em;
+  margin-left : 5px;
+  margin-right : 5px;
+  border-right: 2px solid black;
+}
+.menu li {
+  display : inline;
+}
+.menu li a {
+  color: white;
+  text-decoration: none;
+}
+
+.menu li a:hover {
+  color: rgb(250, 179, 21);
+}
+
+/* style pour la liste des créneaux */
+
+fieldset.creneaux,fieldset.creneaux_staff {
+  align-self: stretch;
+}
+
+div.creneaux {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top : 20px;
+}
+
+.creneaux div:nth-child(odd) {
+  margin-top: 0.5em;
+  margin-bottom: 1em;
+}
+
+div.creneaux_staff {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  margin-top : 20px;
+}
+
+label.round {  /* les labels des checkbox/radios */
+  display : inline-block;
+  border : 1px solid black;
+  padding : 5px 10px;
+  margin : 5px;
+  border-radius : 15px;
+  line-height: calc(22px + 1em);
+  text-align : center;
+  color : white;
+}
+
+.roundlibre {  /* style si pas de résa nécessaire */
+  display : inline-block;
+  padding : 5px 10px;
+  margin : 5px;
+  border-radius : 15px;
+  line-height: calc(22px + 1em);
+  text-align : center;
+  color : green;
+}
+/* style pour la partie admin*/
+
+div.formulaire,div.creneaux_recapitulatif {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top : 20px;
+}
+
+div.modif {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  margin-top : 20px;
+  border : 1px solid black;
+  padding : 5px 10px;
+}
+
+.item_formulaire {
+  margin: 10px;
+}
+
+/* style page de connexion */
+/*:root {
+  --color-main: #71c6dd;
+  --color-main-light: #e1f6fb;
+  --color-dark: #3f4156;
+  --color-dark-medium: #51546e;
+  --color-dark-light: #696d97;
+  --color-light: #e5e5e5;
+  --color-gray: #8b8b8b;
+  --color-light-gray: #b2bdbd;
+  --color-bg: #2d2d39;
+  --color-success: #5dd693;
+  --color-error: #fc4b0b;
+}*/
+
+.layout__box {
+  width: 90%;
+  max-width: 48rem;
+  min-height: 40rem;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -46%);
+  background-color : #6fb8b9;
+  border-radius: 1rem;
+  box-shadow: 1px 1px 6px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.layout__boxHeader {
+  display: flex;
+  padding: 1.5rem;
+  background-color: rgb(34, 34, 204);
+  color: white;}
+
+.layout__body {
+  margin: 3rem;
+}
+
+.login-btn {
+    background-color : green;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 1.5em;
+    cursor: pointer;
+    transition: all ease-in-out 0.3s;
+    padding: 1rem 2rem;
+    border-radius: 5px;
+    box-shadow: 1px 1px 3px 1px rgba(0, 0, 0, 0.15);
+    font-weight: 500;  }
+
+.creation-btn {
+      background-color : blue;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 1em;
+      cursor: pointer;
+      transition: all ease-in-out 0.3s;
+      padding : 10px;
+      border-radius: 5px;
+      color: white;
+      box-shadow: 1px 1px 3px 1px rgba(0, 0, 0, 0.15);
+        }
+
+.form__group {
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.form__group label {
+  display: block;
+  font-size: 1.5em;
+  margin-bottom: 1rem;
+}
+
+.form__group input {
+  background: transparent;
+  border: 1px solid #696d97;
+  padding: 1rem;
+  border-radius: 3px;
+  width: 100%;
+  color: #3f4156;
+  font-weight: 500;
+  outline: none;
+  font-size: 1.5em;
+}
+
+.coordonneesstaff,.lesinscrits {
+  display : grid;
+  grid-template-columns : 1fr 1fr ;
+}
+
+.coordonneesstaff :nth-child(odd) {
+  text-align : right;
+  margin-right : 5px;
+}
+
+.lesinscrits :nth-child(odd) {
+  text-align : center;
+  margin-right : 5px;
+}
+.coordonneesstaff,.lesinscrits :nth-child(even) {
+  text-align : left;
+  margin-left : 5px;
+}

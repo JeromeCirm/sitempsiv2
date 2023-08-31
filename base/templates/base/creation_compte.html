@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+{% if reussi %} <span class="cred"><BR> L demande de création a bien été prise en compte.  <BR>
+Un mail a été envoyé à l'adresse indiquée pour valider l'inscription <BR><BR></span>
+<a href="{% url 'connexion' %}"> Retour à la page de connexion</a> {% else %}
+{% if echec %} <BR><span class="cred">Impossible de créer le compte : <BR> {{ err }} </span><BR>{% endif %}
+<BR>
+<fieldset class="formulaire">
+    <legend>Formulaire d'inscription</legend>
+    <form method="POST" action="">
+        {% csrf_token %}
+        <div class="item_formulaire">
+            <label for="id_login">Choix du login : </label>
+            <input type="text" name="login" maxlength="100" required id="id_login" value="{{ ancien.login }}">
+        </div> 
+        <div class="item_formulaire">
+            <label for="id_prenom">Prénom : </label>
+            <input type="text" name="prenom" maxlength="100" required id="id_prenom" value="{{ ancien.prenom }}">
+        </div> 
+        <div class="item_formulaire">
+            <label for="id_nom">Nom : </label>
+            <input type="text" name="nom" maxlength="100"  id="id_nom" value="{{ ancien.nom }}">
+        </div> 
+        <div class="item_formulaire">
+            <label for="id_mail">mail : </label>
+            <input type="email" name="mail" maxlength="100" required id="id_mail" value="{{ ancien.mail }}">
+        </div> 
+        <div class="item_formulaire">
+            <label for="id_telephone">Téléphone (facultatif) : </label>
+            <input type="text" name="telephone" maxlength="100"  id="id_telephone" value="{{ ancien.telephone }}">
+        </div> 
+        <div class="item_formulaire">
+            <label for="id_password">mot de passe : </label>
+            <input type="password" name="password" maxlength="100" required id="id_password">
+        </div> 
+        <div class="item_formulaire">
+            <label for="id_password_verif">mot de passe, confirmation : </label>
+            <input type="password" name="password_verif" maxlength="100" required id="id_password_verif">
+        </div> 
+        <input class="round" type="submit" value="Création du compte"/>
+
+    </form>
+</fieldset>{% endif %}
+{% endblock body %}

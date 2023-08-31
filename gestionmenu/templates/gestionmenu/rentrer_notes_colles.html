@@ -1,0 +1,252 @@
+{% extends 'gestionmenu/base.html' %}
+
+{% block body %}
+<h1> Saisie des notes de colles </h1>
+<hr>
+
+<div style="text-align:center">
+    <form method="POST" action="">
+        {% csrf_token %}
+        <label> Semaine : </label>
+        <select id="semaine" onchange="maj_information()" name="semaine" type="select">
+            {% for item in lessemaines %}
+            <option value="{{ item.numero }}" {% if item.numero == semaine.numero %}selected="selected"{% endif %}>n°- {{ item.numero }} commençant le {{ item.date }}</option> {% endfor %}
+        </select> {% if listecolleurs %} <label> avec pour colleur </label>
+        <select id="colleur" onchange="maj_information()" name="colleur" type="select">
+            {% for item in listecolleurs %}
+            <option value="{{ item.username }}" {% if item.username == request.user.username %} selected {% endif %}> {{ item.username }}</option> {% endfor %}
+        </select> {% endif %}
+    </form><BR>
+
+    <form method="POST" style="text-align: center;"  action="">
+        {% csrf_token %}
+        Eleves de la semaine selon le planning de colles : <BR>
+        <div id="notessemaine">
+        </div><BR>    
+    Ajout d'une note hors-colloscope : <BR>
+        <div id="autresnotes">
+        </div>
+    <BR>
+    </form>
+</div>
+
+<style>
+select {
+    margin : 5px;
+}
+</style>
+<script>
+    let semaine=document.getElementById("semaine")
+    let colleur=document.getElementById("colleur")
+    let notessemainediv=document.getElementById("notessemaine")
+    let autresnotesdiv=document.getElementById("autresnotes")
+
+    function maj_information() {
+        var formData = new FormData();
+        formData.append('semaine', semaine.value);
+        if (colleur == null) {
+            formData.append('colleur','')
+        } else {
+            formData.append('colleur',colleur.value)
+        }
+        csrf=document.getElementsByName('csrfmiddlewaretoken')[0] 
+        formData.append('csrfmiddlewaretoken',csrf.value)
+        fetch("/recuperation_notes_colles", {
+          method : 'POST',
+          headers : {
+            'Accept': 'application/json, text/plain, */*',
+            },
+            body: formData
+        }).then(function(res){ return res.json();})
+          .then(function(res){
+            affiche_note(res["notessemaine"],res["notesindiv"],res["autresnotes"],res["leseleves"])
+           })
+            .catch(function(err){ console.log('Erreur requête', err);});
+    }
+    
+    function maj_note(eleve,type,info) {
+        if (type=='colloscope') {
+            noteselect=document.getElementById('select_creneau'+info+eleve)
+        } else if (type=='horscolloscope') {
+            noteselect=document.getElementById('select_horscolloscope'+info)
+        } else {
+            noteselect=document.getElementById('select_ajout_'+eleve)
+        }
+        note=noteselect.options[noteselect.selectedIndex].value
+        console.log(eleve,type,info,note)
+        var formData = new FormData();
+        formData.append('semaine', semaine.value);
+        formData.append('eleve', eleve);
+        formData.append('note', note);
+        formData.append('type', type);
+        formData.append('info', info);
+        if (colleur == null) {
+            formData.append('colleur','')
+        } else {
+            formData.append('colleur',colleur.value)
+        }
+        csrf=document.getElementsByName('csrfmiddlewaretoken')[0]
+        formData.append('csrfmiddlewaretoken',csrf.value)
+        fetch("/maj_notes_colles", {
+          method : 'POST',
+          headers : {
+            'Accept': 'application/json, text/plain, */*',
+            },
+            body: formData
+        }).then(function(res){ return res.json();})
+          .then(function(res){
+            maj_information()
+           })
+            .catch(function(err){ console.log('Erreur requête', err);});
+    }
+
+    function affiche_note(notessemaine,notesindiv,autresnotes,leseleves) {
+        /* ordonner les élèves par usename */
+        notessemainediv.innerHTML=""
+        notessemaine.forEach(item => {
+            let label=document.createElement('label')
+            label.innerHTML="groupe "+item[0].toString()+" : "
+            notessemainediv.appendChild(label)
+            notessemainediv.appendChild(document.createElement('BR'))
+            item[1].forEach(record => {
+                let label=document.createElement('input')
+                label.setAttribute('size',20)
+                label.value=record.eleve
+                notessemainediv.appendChild(label)
+                let select=document.createElement('select')
+                let option=document.createElement('option')
+                option.setAttribute('value','')
+                option.innerHTML=''
+                select.appendChild(option)
+                let optionabs=document.createElement('option')
+                optionabs.setAttribute('value',-1)
+                optionabs.innerHTML='Abs'
+                if (record.note==-1) {
+                    optionabs.setAttribute('selected','selected')
+                }                
+                select.appendChild(optionabs)
+                for (let note=20;note>0;note--) {
+                    let option=document.createElement('option')
+                    option.setAttribute('value',note)
+                    option.innerHTML=note
+                    if (note==record.note) {
+                        option.setAttribute('selected','selected')
+                    }
+                    select.appendChild(option)
+                }
+                select.setAttribute('id','select_creneau'+record.creneau+record.user)
+                select.setAttribute('onchange','maj_note("'+record.user +'","colloscope",'+record.creneau+')')
+                notessemainediv.appendChild(select)
+            });
+            notessemainediv.appendChild(document.createElement('BR'))
+        });
+        if (notesindiv.length>0) {
+            let label=document.createElement('label')
+            label.innerHTML="colles individuelles : "
+            notessemainediv.appendChild(label)
+            notessemainediv.appendChild(document.createElement('BR'))
+        }
+        notesindiv.forEach(record=>{
+                let label=document.createElement('input')
+                label.setAttribute('size',20)
+                label.value=record.eleve
+                notessemainediv.appendChild(label)
+                let select=document.createElement('select')
+                let option=document.createElement('option')
+                option.setAttribute('value','')
+                option.innerHTML=''
+                select.appendChild(option)
+                let optionabs=document.createElement('option')
+                optionabs.setAttribute('value',-1)
+                optionabs.innerHTML='Abs'
+                if (record.note==-1) {
+                    optionabs.setAttribute('selected','selected')
+                }                
+                select.appendChild(optionabs)                
+                for (let note=20;note>0;note--) {
+                    let option=document.createElement('option')
+                    option.setAttribute('value',note)
+                    option.innerHTML=note
+                    if (note==record.note) {
+                        option.setAttribute('selected','selected')
+                    }
+                    select.appendChild(option)
+                }
+                select.setAttribute('id','select_creneau'+record.creneau+record.user)
+                select.setAttribute('onchange','maj_note("'+record.user +'","colloscope",'+record.creneau+')')
+                notessemainediv.appendChild(select)
+        });
+        if (notesindiv.length>0) {
+            notessemainediv.appendChild(document.createElement('BR'))
+        }
+        if (autresnotes.length>0) {
+            let label=document.createElement('label')
+            label.innerHTML="notes hors-colloscope : "
+            notessemainediv.appendChild(label)
+            notessemainediv.appendChild(document.createElement('BR'))
+        }
+        let compteur=0
+        autresnotes.forEach(record=>{
+                if (compteur%3 ==0 && compteur !=0) {
+                    notessemainediv.appendChild(document.createElement('BR'))
+                }
+                let label=document.createElement('input')
+                label.setAttribute('size',20)
+                label.value=record.eleve
+                notessemainediv.appendChild(label)
+                let select=document.createElement('select')
+                let option=document.createElement('option')
+                option.setAttribute('value','')
+                option.innerHTML=''
+                select.appendChild(option)
+                let optionabs=document.createElement('option')
+                optionabs.setAttribute('value',-1)
+                optionabs.innerHTML='Abs'
+                if (record.note==-1) {
+                    optionabs.setAttribute('selected','selected')
+                }                
+                select.appendChild(optionabs)                
+                for (let note=20;note>0;note--) {
+                    let option=document.createElement('option')
+                    option.setAttribute('value',note)
+                    option.innerHTML=note
+                    if (note==record.note) {
+                        option.setAttribute('selected','selected')
+                    }
+                    select.appendChild(option)
+                }
+                select.setAttribute('id','select_horscolloscope'+record.idnote)
+                select.setAttribute('onchange','maj_note("'+record.user +'","horscolloscope",'+record.idnote+')')
+                notessemainediv.appendChild(select)
+                compteur=compteur+1
+        });
+        autresnotesdiv.innerHTML=""
+        leseleves.forEach(record=>{
+            let label=document.createElement('input')
+            label.setAttribute('size',20)
+            label.value=record.eleve
+            autresnotesdiv.appendChild(label)
+            let select=document.createElement('select')
+            let option=document.createElement('option')
+            option.setAttribute('value','')
+            option.innerHTML=''
+            select.appendChild(option)
+            let optionabs=document.createElement('option')
+            optionabs.setAttribute('value',-1)
+            optionabs.innerHTML='Abs'               
+            select.appendChild(optionabs)
+            for (let note=20;note>0;note--) {
+                let option=document.createElement('option')
+                option.setAttribute('value',note)
+                option.innerHTML=note
+                select.appendChild(option)
+            }
+            select.setAttribute('id','select_ajout_'+record.user)
+            select.setAttribute('onchange','maj_note("'+record.user+'","ajout","")')
+            autresnotesdiv.appendChild(select)
+        });
+    }
+
+maj_information()
+    </script>
+{% endblock body %}

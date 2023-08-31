@@ -1,0 +1,12 @@
+{% extends 'gestionmenu/base.html' %}
+
+{% block body %}
+<h1> gestion de sous-menus dans le menu : {{ idmenu }}</h1>
+<hr>
+
+<form method="POST" action="">
+    {% csrf_token %}
+    {{form.as_p}}
+    <input type="submit" value="Submit"/>
+</form>
+{% endblock body %}

@@ -1,0 +1,188 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>{{ titresite }}</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'assets/favicon.ico' %}" />
+
+    
+    <!-- <script src="index_java.js?=1640022458" defer></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script> -->
+        
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    
+    <link rel="stylesheet" type="text/css" media="screen" href="{% static 'gestionmenu/style.css' %}">
+
+</head>
+
+<body>
+<!--
+    <header class="header">
+-->
+<header>
+
+<div class="bg-light py-2" style="display:flex; 
+  align-items: center;
+  justify-content: space-between">
+
+         <a class="navbar-brand header_icone" href="/" style="padding-left:15px;">
+             <img width="32" height="32" src="{% static 'assets/logo.svg' %}" /> 
+        </a>
+         
+         
+         {% if request.user.is_authenticated %} 
+        <a class="navbar-brand" style="text-align:left;" href="#">
+        Bonjour {% if request.user.first_name %}{{ request.user.first_name }} {% else %} {{ request.user.username }} {% endif %}!
+        </a> 
+        {% endif %}
+
+        <a class="navbar-brand" href="{% url 'deconnexion' %}"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+            <title>déconnexion</title>
+            <path
+              d="M3 0h22c0.553 0 1 0 1 0.553l-0 3.447h-2v-2h-20v28h20v-2h2l0 3.447c0 0.553-0.447 0.553-1 0.553h-22c-0.553 0-1-0.447-1-1v-30c0-0.553 0.447-1 1-1z"
+            ></path>
+            <path
+              d="M21.879 21.293l1.414 1.414 6.707-6.707-6.707-6.707-1.414 1.414 4.293 4.293h-14.172v2h14.172l-4.293 4.293z"
+            ></path>
+            </svg>
+        </a>
+ 
+</div> 
+        
+<nav id="navbar_top" class="autohide navbar navbar-expand-lg navbar-light" style="background-color: #e3f2fd; display:flex; 
+  align-items: center; justify-content: space-between;"> 
+    
+
+           
+<div class="container-fluid"> 
+<!-- début menu -->
+<!--
+<a class="navbar-brand" href="#">Navbar</a>
+-->
+<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+<span class="navbar-toggler-icon"></span>
+</button> 
+
+<!-- menu -->   
+<div class="collapse navbar-collapse" id="navbarSupportedContent"> 
+<ul class="navbar-nav mr-auto">
+   
+ {% if request.user.is_authenticated %}     
+      
+     {% for item in menu %}
+                                                             
+                    {% if item.3|length %} 
+                        <li class="nav-item dropdown">
+                             <a class="nav-link dropdown-toggle" {% if item.2 != -1 %} href="{% url 'menu' item.1 %}" {% endif %} id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{item.0}}
+                             </a>                                   
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    {% for subitem in item.3 %}
+                                            <a class="dropdown-item" href="{% if subitem.3 %} {{subitem.2}} {% else %}{% url 'menu' subitem.1 %}{% endif %}">{{subitem.0}}</a>
+                                    {% endfor %}
+                             </div>
+                        </li>
+                    {% else %}
+                            <li class="nav-link"><a {% if item.2 != -1 %} href="{% url 'menu' item.1 %}" {% endif %}>{{item.0}}</a>  
+                            </li>
+                     {% endif %}
+                </li>
+      {% endfor %} 
+</ul>
+    
+
+{% else %} <!-- de l'authentification -->
+    <li class="nav-link">
+          <a href="{% url 'login' %}"> Connexion </a>
+    </li>
+{% endif %}
+
+</div><!-- fin menu -->
+
+</div>
+</nav>
+</header>
+
+
+
+<!--
+</header>
+-->
+
+<!--
+<hr>
+-->
+<!--
+<div class="container">
+-->
+<!--
+    <section class="section-content py-5 px-5" style="margin-top: 100px;">
+-->
+        
+      
+    {% block body %}
+
+    {% endblock body %}
+    
+   <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+<script>
+   //document.addEventListener("DOMContentLoaded", function () {
+
+      //el_autohide = document.querySelector('.autohide');
+
+      //// add padding-top to bady (if necessary)
+      //navbar_height = document.querySelector('.navbar').offsetHeight;
+      //document.body.style.paddingTop = navbar_height + 'px';
+
+      //if (el_autohide) {
+
+        //var last_scroll_top = 0;
+        //window.addEventListener('scroll', function () {
+          //let scroll_top = window.scrollY;
+          //if (scroll_top < last_scroll_top) {
+            //el_autohide.classList.remove('scrolled-down');
+            //el_autohide.classList.add('scrolled-up');
+          //} else {
+            //el_autohide.classList.remove('scrolled-up');
+            //el_autohide.classList.add('scrolled-down');
+          //}
+          //last_scroll_top = scroll_top;
+
+        //});
+        //// window.addEventListener
+
+      //}
+      //// if
+
+    //});
+    
+    
+    document.addEventListener("DOMContentLoaded", function(){
+  window.addEventListener('scroll', function() {
+      if (window.scrollY > 50) {
+        document.getElementById('navbar_top').classList.add('fixed-top');
+        // add padding top to show content behind navbar
+        navbar_height = document.querySelector('.navbar').offsetHeight;
+        document.body.style.paddingTop = navbar_height + 'px';
+      } else {
+        document.getElementById('navbar_top').classList.remove('fixed-top');
+         // remove padding top from body
+        document.body.style.paddingTop = '0';
+      } 
+  });
+}); 
+    
+</script>
+
+
+</body>
+</html>

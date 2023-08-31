@@ -1,0 +1,105 @@
+{% extends 'gestionmenu/base.html' %}
+{% load static %}
+{% block body %}
+
+<h1> Gestion des colles de {{ titre }} </h1>
+<hr>
+<br>
+<form method="POST" id="form_eleve" action="">
+    {% csrf_token %}<div style="text-align:center">
+    <label for="check">Autoriser les modifications par les élèves : </label> 
+    <input onchange="this.form.submit()" type="checkbox" id="check" name="check" {% if modif_par_eleves %} checked {% endif %}></div>
+    <input hidden name="matiere" value="{{ matiere }}">
+</form>
+<div id="liste_creneau" style="text-align:center">
+</div>
+<script>
+let liste_creneau=document.getElementById("liste_creneau")
+
+function maj_creneau() {
+            var formData = new FormData();
+            formData.append('matiere', '{{ matiere }}');
+            csrf=document.getElementsByName('csrfmiddlewaretoken')[0]
+            formData.append('csrfmiddlewaretoken',csrf.value)
+            fetch("/recuperation_creneaux_individuels_gestionnaire", {
+              method : 'POST',
+              headers : {
+                'Accept': 'application/json, text/plain, */*',
+                },
+                body: formData
+            }).then(function(res){ return res.json();})
+              .then(function(res){
+                affiche_creneaux(res["creneaux"])
+            })
+                .catch(function(err){ console.log('Erreur requête', err);});
+        }
+
+function affiche_creneaux(creneaux) {
+    /* ordonner les élèves par usename */
+    liste_creneau.innerHTML=""
+    for (numero in creneaux) {
+        var semaine=creneaux[numero]
+        liste_creneau.appendChild(document.createElement("br"))
+        debut=document.createElement('div')
+        debut.innerHTML="Semaine numéro "+numero+" commençant le "+semaine['date']
+        liste_creneau.appendChild(debut)
+        liste_creneau.appendChild(document.createElement("br"))
+        for (jour in semaine) {
+            if (jour != "date") {
+            semaine[jour].forEach(element =>{
+                var item=document.createElement('span')
+                item.innerHTML=" "+element[0]+". Remplacer par : "
+                liste_creneau.appendChild(item)
+
+                let select=document.createElement('select')
+                let option=document.createElement('option')
+                option.setAttribute('value','')
+                option.innerHTML='Non attribué'
+                if (element[2]=="") {
+                    option.setAttribute('selected','selected')
+                }
+                select.appendChild(option)
+                {% for uneleve in leseleves %}
+                option=document.createElement('option')
+                option.setAttribute('value',"{{ uneleve.username }}")
+                option.innerHTML="{{ uneleve.first_name }} {{ uneleve.last_name }}"
+                if (element[2]=="{{ uneleve.username }}") {
+                    option.setAttribute('selected','selected')
+                }                
+                select.appendChild(option)
+                {% endfor %}
+                select.setAttribute('id','select_ajout_'+element[1])
+                select.setAttribute('onchange','action('+element[1]+')')
+                liste_creneau.appendChild(select)
+                liste_creneau.appendChild(document.createElement("br"))
+            }); }
+        } 
+    }
+}
+
+function action(id) {
+            var formData = new FormData();
+            formData.append('id', id);
+            eleveselect=document.getElementById('select_ajout_'+id)
+            eleve=eleveselect.options[eleveselect.selectedIndex].value
+            formData.append('eleve', eleve);
+            formData.append('matiere', '{{ matiere }}');
+            csrf=document.getElementsByName('csrfmiddlewaretoken')[0]
+            formData.append('csrfmiddlewaretoken',csrf.value)
+            fetch("/action_creneaux_individuels_gestionnaire", {
+              method : 'POST',
+              headers : {
+                'Accept': 'application/json, text/plain, */*',
+                },
+                body: formData
+            }).then(function(res){ return res.json();})
+              .then(function(res){
+                maj_creneau()
+            })
+                .catch(function(err){ console.log('Erreur requête', err);});
+        }
+
+
+maj_creneau()
+</script>
+{% endblock body %}

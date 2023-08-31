@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="layout__box">
+    <div class="layout__boxHeader">
+        {% if reussi %} <h2>Changement de mot de passe effectué.</h2> </div> <BR><BR>        
+<INPUT TYPE='button'class="login-btn" Value='Accès au site' onClick="javascript:window.location='home'"> 
+        {% else %} 
+        <h2>Première connexion au site : <BR> Un changement de mot de passe s'impose !</h2>
+    </div>   {% if msg %}<span style="color:red;"> <BR>{{ msg }}</span>  {% endif %}
+    <div class="layout__body">
+      <form class="form" method="POST" action="">
+        {% csrf_token %}
+        <div class="form__group">
+          <label for="username">Nom d'utilisateur</label>
+          <input id="username" name="username" type="text" autofocus="True"/>
+        </div>
+        <div class="form__group">
+          <label for="password">Mot de passe initial </label>
+          <input name="password" type="password"/>
+        </div>
+        <div class="form__group">
+            <label for="passwordnew">Nouveau mot de passe </label>
+            <input name="passwordnew" type="password"/>
+          </div>
+          <div class="form__group">
+            <label for="passwordconfirm">Confirmer le nouveau mot de passe </label>
+            <input name="passwordconfirm" type="password"/>
+          </div>
+
+        <button class="login-btn" type="submit">
+          Valider
+        </button><BR><BR>
+      </form>
+    </div> {% endif %}
+
+  </div>
+
+
+
+{% endblock body %}

@@ -1,0 +1,16 @@
+{% extends 'gestionmenu/base.html' %}
+
+{% block body %}
+<h1> Liste des notes de colles rentrées </h1>
+<hr>
+
+<div style="text-align:center">
+<div id="lesnotes">
+    <ul>
+        {% for item in contenu %}
+        <li>semaine {{ item.semaine }} : {% if item.note == -1 %} Absent(e) {% else %} {{ item.note }} {% endif %} avec {{ item.colleur }}</li>
+        {% endfor %}
+    </ul>
+</div>
+</div>
+{% endblock body %}

@@ -1,0 +1,30 @@
+{% extends 'gestionmenu/base.html' %}
+
+{% block body %}
+<h1> Fiche de renseignement : </h1>
+<hr>
+
+<div class="textedinfo">
+<form method="POST" action=""> <BR>
+  <span style="color:green">{{ msg }}</span>{% if autoriser_changement_renseignement %} <BR> <BR>
+    <input type="submit" value="Validation des modifications"/> {% endif %} 
+    {% csrf_token %}<BR><BR>
+    
+ 
+      <p>    
+        <label for="prenom"> Prénom usuel : </label>
+        <input type="text" id="prenom" name="prenom" value="{{ prenom }}">
+      </p>
+      <p>    
+        <label for="nom"> Nom usuel : </label>
+        <input type="text" id="nom" name="nom" value="{{ nom }}">
+      </p>
+      <p>    
+    <label for="mail"> Adresse mail : </label>
+    <input type="email" id="mail" name="mail" value="{{ mail }}">
+  </p>
+    {{form.as_p}}
+</form>
+
+</div>
+{% endblock body %}

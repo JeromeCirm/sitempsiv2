@@ -1,0 +1,116 @@
+{% extends 'gestionmenu/base.html' %}
+{% load gestionmenutags %}
+
+{% block body %}
+<DIV style="text-align:center">  <BR>
+
+<form method="POST" action="">
+    {% csrf_token %}
+<div> Informations pour la semaine numéro <select id="informations" onchange="maj_informations()">
+    {% for unesemaine in lessemaines %} <option value="{{ unesemaine.numero }}">{{ unesemaine.numero }} commençant le {{ unesemaine.date }}</option>{% endfor %}
+</select></div><div style="padding : 10px;display:inline-block;text-align:left" id="indic_semaine"> </div>
+</form>
+{% if les_groupes %}
+<DIV style="padding : 10px;display:inline-block;text-align:left">
+    {% for unitem in les_groupes %}
+        <input name="alire" class="inputmobilemarc5" value="Groupe {{ unitem.numero }}" disabled>    
+        <input name="alire" class="inputmobilemarc4" value="{% for x in unitem.eleves.all %} {{ x.first_name }} {{ x.last_name }}, {% endfor %}" disabled>    <BR>
+    {% endfor %}
+</DIV>
+{% endif %}
+</DIV>
+
+<script>
+    let indic_semaine=document.getElementById("indic_semaine")
+    let informations=document.getElementById("informations")
+    
+    function maj_informations() {
+            var formData = new FormData();
+            formData.append('semaine', informations.value);
+            csrf=document.getElementsByName('csrfmiddlewaretoken')[0]
+            formData.append('csrfmiddlewaretoken',csrf.value)
+            fetch("/recuperation_colloscope_semaine", {
+              method : 'POST',
+              headers : {
+                'Accept': 'application/json, text/plain, */*',
+                },
+                body: formData
+            }).then(function(res){ return res.json();})
+              .then(function(res){
+                affiche_informations(res["informations"])
+               })
+                .catch(function(err){ console.log('Erreur requête', err);});
+        }
+    
+    function affiche_informations(informations) {
+        indic_semaine.innerHTML=""
+        indic_semaine.appendChild(document.createElement('BR'))
+        var l=["lundi","mardi","mercredi","jeudi","vendredi","samedi"]
+        l.forEach(function(key) {
+            if (informations[key].length!=0) {
+                var item=document.createElement('input')
+                item.value=key
+                item.disabled
+                //item.size=7  
+                item.setAttribute('class','inputmobilemarc5') // marc
+                indic_semaine.appendChild(item)
+                informations[key].forEach(function (u) {
+                    var item=document.createElement('input')
+                    item.value=u[0]+" avec "+u[1]+" à "+u[2]+" en "+u[3]+" ("+u[4]+")"
+                    item.disabled
+                    //item.size=100
+                    item.setAttribute('class','inputmobilemarc4')
+                    indic_semaine.appendChild(item)
+                    var item=document.createElement('input')
+                    indic_semaine.appendChild(document.createElement("br"))
+                    item.value=""
+                    item.disabled
+                    //item.size=7
+                    item.setAttribute('class','inputmobilemarc5')
+                    indic_semaine.appendChild(item)
+                })
+                var item=document.createElement('input')
+                item.value=""
+                item.disabled
+                //item.size=100
+                item.setAttribute('class','inputmobilemarc4')
+                indic_semaine.appendChild(item)
+                indic_semaine.appendChild(document.createElement("br"))
+            }
+        } )
+        if (informations["autre_jour"].length!=0) {
+                var item=document.createElement('input')
+                item.value="autre"
+                item.disabled
+                // item.size=7
+                item.setAttribute('class','inputmobilemarc5')
+                indic_semaine.appendChild(item)
+                informations["autre_jour"].forEach(function (u) {
+                    var item=document.createElement('input')
+                    item.value=u[0]+" avec "+u[1]+" à "+u[2]+" en "+u[3]+" ("+u[4]+" "+u[5]+")"
+                    item.disabled
+                    //item.size=100
+                    item.setAttribute('class','inputmobilemarc4')
+                    indic_semaine.appendChild(item)
+                    var item=document.createElement('input')
+                    indic_semaine.appendChild(document.createElement("br"))
+                    item.value=""
+                    item.disabled
+                    //item.size=7
+                    item.setAttribute('class','inputmobilemarc5')
+                    indic_semaine.appendChild(item)
+                })
+                var item=document.createElement('input')
+                item.value=""
+                item.disabled
+                //item.size=100
+                item.setAttribute('class','inputmobilemarc4')
+                indic_semaine.appendChild(item)
+                indic_semaine.appendChild(document.createElement("br"))
+            }
+    }
+    
+    maj_informations()
+    </script>
+
+{% endblock body %}

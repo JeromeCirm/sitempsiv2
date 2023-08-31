@@ -1,0 +1,25 @@
+{% extends 'gestionmenu/base.html' %}
+{% load static %}
+{% block body %}
+
+<h1> gestion de programme de colle {{ id }}</h1>
+<hr>
+
+<form method="POST" enctype="multipart/form-data" action="">
+    {% csrf_token %}
+    {{ formprogdescription.as_p }}
+    <input type="submit" value="Soumettre le changement de description"/>
+</form>
+
+<form method="POST" enctype="multipart/form-data" action="">
+    {% csrf_token %}
+    {{ formprogprogramme.as_p }}
+    <input type="submit" value="Soumettre le changement de fichier programme"/>
+</form>
+
+<form method="POST" enctype="multipart/form-data" action="">
+    {% csrf_token %}
+    {{ formprogexercices.as_p }}
+    <input type="submit" value="Soumettre le changement de fichier exercices"/>
+</form>
+{% endblock body %}

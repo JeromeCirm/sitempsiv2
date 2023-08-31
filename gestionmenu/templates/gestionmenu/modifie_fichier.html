@@ -1,0 +1,20 @@
+{% extends 'gestionmenu/base.html' %}
+
+{% block body %}
+<h1> gestion du fichier {{ nom_fichier }} </h1>
+<hr>
+
+<form method="POST" enctype="multipart/form-data" action="">
+    {% csrf_token %}
+    {{formdescription.as_p}}
+    <label for="id_date_parution">Date parution:</label>
+    <input type="date" name="date_parution" id="id_date_parution" value="{{ date_parution }}">
+    <input type="submit" value="Soumettre le changement de description et/ou date de parution"/>
+</form>
+
+<form method="POST" enctype="multipart/form-data" action="">
+    {% csrf_token %}
+    {{formfichier.as_p}}
+    <input type="submit" value="Soumettre le changement de fichier"/>
+</form>
+{% endblock body %}

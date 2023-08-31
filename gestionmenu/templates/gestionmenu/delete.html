@@ -1,0 +1,14 @@
+{% extends 'gestionmenu/base.html' %}
+
+{% block body %}
+
+<form method="POST" value="">
+    {% csrf_token %}
+    <label> Etes-vous sûr de vouloir supprimer {{ obj }} ?</label>
+    <input type="hidden" name="validation" value="oui"> 
+    <input type="submit" value="oui" /> <BR>
+    <a href="{{ request.META.HTTP_REFERER }}"> retour</a> à la page précédente
+
+</form>
+
+{% endblock body %}

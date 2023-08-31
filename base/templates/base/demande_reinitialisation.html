@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<BR>
+{% if not autorise %} <span class="cred">{{ msg }}</span><BR><BR> {% else %}
+    <fieldset class="formulaire">
+        <legend>Saisir le nouveau mot de passe pour le compte {{ login }}: </legend>
+        <form method="POST" action="">
+            {% csrf_token %}
+            <div class="item_formulaire">
+                <label for="password">Nouveau mot de passe : </label>
+                <input type="password" name="password" maxlength="100" required id="password">
+            </div> 
+            <input type="hidden" name="login" value="{{ login }}" />
+            <input type="hidden" name="hash" value="{{ hash}}" />            
+            <input class="round" type="submit" value="Valider ce nouveau mot de passe"/>
+    
+        </form>
+    </fieldset> <BR> {% endif %}
+    <a href="{% url 'home' %}"> Retour à la page d'accueil</a>
+
+{% endblock body %}

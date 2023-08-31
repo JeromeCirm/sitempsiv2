@@ -1,0 +1,70 @@
+{% extends 'gestionmenu/base.html' %}
+
+{% block body %}
+<BR>
+ <DIV class=cadreinfo style="text-align:center;">
+    {% if prof %}
+    <form method="POST" style="text-align: center;" action="">
+        {% csrf_token %}
+        <DIV class="textedinfo">
+            <textarea name="annonce" rows="15" cols="35">{{ annonce }}</textarea> <BR>
+            <input type="submit" value="Valider le changement de texte">
+            </form>
+        </DIV>
+    {% elif eleve %} 
+    <DIV class="textedinfo">
+        <form method="POST" action="">
+            {% csrf_token %}
+            <div> Informations pour la semaine numéro <select id="informations" onchange="maj_informations()">
+                {% for unesemaine in lessemaines %} <option value="{{ unesemaine.numero }}">{{ unesemaine.numero }} commençant le {{ unesemaine.date }}</option>{% endfor %}
+            </select></div>
+            <div id="indic_semaine"></div>
+        </form>
+    </DIV>
+    <DIV class="textedinfo">
+        <textarea name="index" rows="15" cols="80" disabled>{{ annonce }}</textarea> <BR>
+    </DIV>
+    {% else %}
+    <DIV class="textedinfo">
+    Bonjour !
+    </DIV>
+    {% endif %}
+ </DIV>   
+
+<script>
+let indic_semaine=document.getElementById("indic_semaine")
+let informations=document.getElementById("informations")
+
+function maj_informations() {
+        var formData = new FormData();
+        formData.append('semaine', informations.value);
+        csrf=document.getElementsByName('csrfmiddlewaretoken')[0]
+        formData.append('csrfmiddlewaretoken',csrf.value)
+        fetch("/recuperation_informations_home", {
+          method : 'POST',
+          headers : {
+            'Accept': 'application/json, text/plain, */*',
+            },
+            body: formData
+        }).then(function(res){ return res.json();})
+          .then(function(res){
+            affiche_informations(res["informations"])
+           })
+            .catch(function(err){ console.log('Erreur requête', err);});
+    }
+
+function affiche_informations(informations) {
+    indic_semaine.innerHTML=""
+    indic_semaine.appendChild(document.createElement('BR'))
+    for (numero_ligne in informations) {
+        ligne=informations[numero_ligne]
+        let ligne_texte=document.createElement('div')
+        ligne_texte.innerHTML=ligne
+        indic_semaine.appendChild(ligne_texte)
+    }
+}
+
+maj_informations()
+</script>
+
+{% endblock body %}

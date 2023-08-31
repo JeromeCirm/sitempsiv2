@@ -1,0 +1,95 @@
+{% extends 'gestionmenu/base.html' %}
+
+{% block body %}
+<h1> Récapitulatif des notes de colles </h1>
+<hr>
+
+<div style="text-align:center">
+    <form method="POST" action="">
+        {% csrf_token %}
+        <label>Semaine en cours : </label>
+        <select id="semaine" name="semaine" onchange="recupere_notes()" type="select">
+            {% for item in lessemaines %}
+            <option value="{{ item.numero }}" {% if item.numero == semaine.numero %}selected="selected"{% endif %}>n°- {{ item.numero }} commençant le {{ item.date }}</option> {% endfor %}
+        </select>
+    </form><BR>
+
+    <div id="lesnotes">
+    </div>
+<BR><BR>
+    liste des élèves notés plusieurs fois cette semaine:<BR>
+    <div id="doublons">
+    </div>  
+</div>
+<BR><BR>
+<script>
+let semaine=document.getElementById("semaine")
+let lesnotes=document.getElementById("lesnotes")
+let doublons=document.getElementById("doublons")
+
+function recupere_notes() {
+    var formData = new FormData();
+    formData.append('semaine', semaine.value);
+    formData.append('colleur','__all__')
+    csrf=document.getElementsByName('csrfmiddlewaretoken')[0]
+    formData.append('csrfmiddlewaretoken',csrf.value)
+    fetch("/recuperation_notes_colles", {
+      method : 'POST',
+      headers : {
+        'Accept': 'application/json, text/plain, */*',
+      },
+      body: formData
+    }).then(function(res){ return res.json();})
+      .then(function(res){
+        affiche_note(res["lesnotes"],res["doublons"])
+      })
+      .catch(function(err){ console.log('Erreur requête', err);});
+}
+
+function affiche_note(lesnotesliste,doublonsliste) {
+    /* ordonner les élèves par usename */
+    lesnotes.innerHTML=""
+    for (item in lesnotesliste) {
+        let colleur=""
+        let note=""
+        if (lesnotesliste[item]!='') {
+            colleur="avec "+lesnotesliste[item]["colleur"]
+            note=lesnotesliste[item]["note"]
+        }
+        let bnote=document.createElement('div')
+        bnote.setAttribute('class','divtableau')
+        lesnotes.appendChild(bnote)
+        let label=document.createElement('input')
+        // label.setAttribute('size',8)
+        label.setAttribute('class','inputmobilemarc1')
+        label.value=item
+        bnote.appendChild(label)
+        let label2=document.createElement('input')
+        // label2.setAttribute('size',1)
+        label2.setAttribute('class','inputmobilemarc2')
+        if (note == -1) {
+            label2.value='Abs'
+        } else {
+            label2.value=note
+        }
+        bnote.appendChild(label2)
+        let label3=document.createElement('input')
+        // label3.setAttribute('size',10)
+        label3.setAttribute('class','inputmobilemarc3')
+        label3.value=colleur
+        bnote.appendChild(label3)
+    }
+    doublons.innerHTML=""
+    for (item in doublonsliste) {
+        for (x in doublonsliste[item]) {
+            unenote=doublonsliste[item][x]
+            note=unenote["note"]
+            colleur=unenote["colleur"]
+            doublons.innerHTML+=item+" : "+note+" avec "+colleur+", "
+        }
+    }
+}
+
+recupere_notes()
+</script>
+{% endblock body %}

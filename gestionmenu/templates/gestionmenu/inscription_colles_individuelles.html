@@ -1,0 +1,86 @@
+{% extends 'gestionmenu/base.html' %}
+{% load static %}
+{% block body %}
+
+<h1> Inscriptions pour les colles de {{ titre }} </h1>
+<hr>
+<br><br>
+<div id="liste_creneau" style="text-align:center">
+</div>
+<form method="POST" id="form_eleve" action="">
+    {% csrf_token %}
+</form>
+<script>
+let liste_creneau=document.getElementById("liste_creneau")
+
+function maj_creneau() {
+            var formData = new FormData();
+            formData.append('matiere', '{{ matiere }}');
+            csrf=document.getElementsByName('csrfmiddlewaretoken')[0]
+            formData.append('csrfmiddlewaretoken',csrf.value)
+            fetch("/recuperation_creneaux_individuels", {
+              method : 'POST',
+              headers : {
+                'Accept': 'application/json, text/plain, */*',
+                },
+                body: formData
+            }).then(function(res){ return res.json();})
+              .then(function(res){
+                affiche_creneaux(res["creneaux"],res["creneaux_occupes"])
+            })
+                .catch(function(err){ console.log('Erreur requête', err);});
+        }
+
+function affiche_creneaux(creneaux,creneaux_occupes) {
+    /* ordonner les élèves par usename */
+    liste_creneau.innerHTML=""
+    for (numero in creneaux) {
+        var semaine=creneaux[numero]
+        liste_creneau.appendChild(document.createElement("br"))
+        debut=document.createElement('div')
+        debut.innerHTML="Semaine numéro "+numero+" commençant le "+semaine['date']
+        liste_creneau.appendChild(debut)
+        liste_creneau.appendChild(document.createElement("br"))
+        for (jour in semaine) {
+            if (jour != "date") {
+            semaine[jour].forEach(element =>{ {% if modif_par_eleves %}
+                if (element[1]=="se désinscrire" || (element[1]=="s'inscrire" && creneaux_occupes<{{ max_par_eleve }}) || (element[1]=="remplacer" && creneaux_occupes<{{ max_garanti }})) {
+                    var item=document.createElement('button')
+                    item.innerHTML=element[1]
+                    item.setAttribute('onclick','action("'+element[1]+'",'+element[2]+')')
+                    liste_creneau.appendChild(item)
+                } {% endif %}
+                var item=document.createElement('span')
+                item.innerHTML=" "+element[0]
+                liste_creneau.appendChild(item)
+                liste_creneau.appendChild(document.createElement("br"))
+            }); }
+        } 
+    }
+}
+
+function action(etat,id) {
+            var formData = new FormData();
+            formData.append('id', id);
+            formData.append('etat', etat);
+            formData.append('matiere', '{{ matiere }}');
+            csrf=document.getElementsByName('csrfmiddlewaretoken')[0]
+            formData.append('csrfmiddlewaretoken',csrf.value)
+            fetch("/action_creneaux_individuels", {
+              method : 'POST',
+              headers : {
+                'Accept': 'application/json, text/plain, */*',
+                },
+                body: formData
+            }).then(function(res){ return res.json();})
+              .then(function(res){
+                maj_creneau()
+            })
+                .catch(function(err){ console.log('Erreur requête', err);});
+        }
+
+
+
+maj_creneau()
+</script>
+{% endblock body %}

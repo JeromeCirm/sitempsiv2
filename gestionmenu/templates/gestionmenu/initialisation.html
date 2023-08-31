@@ -1,0 +1,27 @@
+{% extends 'gestionmenu/base.html' %}
+
+{% block body %}
+
+<BR>
+<DIV style="text-align:center">  Liste des actions d'initialisation :<BR><BR>
+    <DIV style="padding : 10px;display:inline-block;text-align:left">
+<form id="form" method="POST" value="">
+    {% csrf_token %}  {% for key,value in lesactions.items %}
+    <button onclick="go('{{ key }}')"> action : </button> {{ value }}<BR><BR>{% endfor %}
+
+
+    <input id="action" type="hidden" name="action" value="">
+</form><BR>
+    </DIV>
+    </DIV>
+{% for item in msg %} <div> {{ item }}</div> {% endfor %}
+<script>
+let form=document.getElementById('form')
+let action=document.getElementById('action')
+
+function go(valeur) {
+    action.value=valeur
+    form.submit()
+}
+</script>
+{% endblock body %}

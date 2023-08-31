@@ -1,0 +1,95 @@
+{% extends 'gestionmenu/base.html' %}
+
+{% block body %}
+<h1> Fiche de renseignements des élèves </h1>
+<hr>
+
+<div class="textedinfo"> 
+    <form method="POST" id='form' action="">
+        {% csrf_token %}
+        <label for="annee"> Année : </label><input type="number" name="annee" onchange="maj()" id="annee" value="{{ annee }}"><BR><BR>
+        <label for="eleve" > Elève : </label><select name="eleve" id="eleve"></select>
+        <button onclick="execute('')"> Afficher la fiche de cet élève </button>
+        <input type="hidden" id="action" name="action" value="">  
+        <input type="hidden" id="valeur" name="valeur" value="">  
+    </form>
+    <BR>{% if login %} Fiche de {{ login }} année {{ annee }}{% endif %}
+    {% if gestionnaire %} <button onclick="execute('ajout')"> Ajouter un fichier </button> {% endif %}
+      {% if lesfichiers %} fichiers compléments :  {% for x in lesfichiers %} <a href="{% url 'download_fiche' x.id %}"> {{ x.nomfichier }} </a> 
+      <a href="{% url 'supprime_fiche' x.id %}">
+        <svg class="svg-icon" style="width: 2em; height: 2em;vertical-align: middle;overflow: hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"><title>supprimer</title><path d="M408 448h48v320h-48zM568 448h48v320h-48z"  /><path d="M808 336a88.064 88.064 0 0 0-88-88h-104V224c0-39.68-32.32-72-72-72h-64c-39.68 0-72 32.32-72 72v24H304a88.064 88.064 0 0 0-88 88v56.032h64V872h464V392.032h64V336z m-352-112c0-13.216 10.784-24 24-24h64c13.216 0 24 10.784 24 24v24h-112V224z m240 600h-368V392.032h368V824z m64-479.968H264V336c0-22.048 17.952-40 40-40h416c22.048 0 40 17.952 40 40v8.032z"  /></svg>
+      </a>, {% endfor %} {% endif %}
+</div>
+<div>
+    <BR>
+<div class="textedinfo"> 
+    <p>    
+        <label for="prenom"> Prénom usuel : </label>
+        <input type="text" id="prenom" name="prenom" value="{{ prenom }}">
+      </p>
+      <p>    
+        <label for="nom"> Nom usuel : </label>
+        <input type="text" id="nom" name="nom" value="{{ nom }}">
+      </p>
+    <p>
+    <label for="mail"> Mail : </label>
+    <input type="email" id="mail" name="mail" value="{{ mail }}">
+    </p>
+    {{ donnees.as_p }}
+</div>
+</div>
+<script>
+let annee=document.getElementById('annee')
+let eleve=document.getElementById('eleve')
+
+function maj(val) {
+    let formData = new FormData();
+    valeur=parseInt(annee.value)
+    formData.append('annee',valeur)
+    csrf=document.getElementsByName('csrfmiddlewaretoken')[0]
+    formData.append('csrfmiddlewaretoken',csrf.value)
+    fetch("/recupere_eleves",{
+        method : 'POST',
+        headers : {
+            'Accept': 'application/json, text/plain, */*',
+        },
+        body: formData
+    }).then(function(res){ return res.json();})
+      .then(function(res){
+        affiche_eleves(res["eleves"],val)
+      })
+      .catch(function(err){ console.log('Erreur requête', err);});
+
+}
+
+function affiche_eleves(liste_eleves,val) {
+    let options=eleve.getElementsByTagName('option')
+    while (options[0]) {
+        eleve.removeChild(options[0])
+    }
+    for (let i=0;i<liste_eleves.length;i++) {
+        let t=document.createTextNode(liste_eleves[i])
+        let opt=document.createElement("option")
+        opt.setAttribute("value",liste_eleves[i])
+        if (liste_eleves[i]==val) {
+            opt.selected="true"
+        }
+        opt.appendChild(t)
+        eleve.appendChild(opt)
+    }
+}
+
+function execute(msg) {
+    let action=document.getElementById('action')
+    let form=document.getElementById('form')
+    action.value=msg
+    form.submit()
+}
+
+if ({{ selection }}) {
+    maj('{{ login }}')
+} else {
+    maj('')
+}
+</script>
+{% endblock body %}

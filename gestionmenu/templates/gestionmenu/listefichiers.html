@@ -1,0 +1,71 @@
+{% extends 'gestionmenu/base.html' %}
+
+{% block body %}
+
+<h1> {{ lemenu.nom }} 
+    {% if gestionnaire %}
+    <a href="{% url 'ajout_fichier' lemenu.id %}">
+      <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
+          <title>ajout d'un fichier</title>
+          <path
+            d="M 10 0 L 10 20 M 0 10 L 20 10 M 10 0"
+            stroke="black" stroke-width="1.2" fill="none"
+          ></path>
+      </svg>
+    </a>
+    {% endif %}
+    </h1>  
+    
+    {% if fichier|length %}
+        <ul class="fichiers">    
+        {% for item in fichier %}
+            <li>
+                <div class="fichiersGauche">
+                    {% if item.fichier %}
+                    <a href="/download/{{ item.id }}" >
+                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+                          <title>téléchargement</title>
+                          <path d="M25.462,19.105v6.848H4.515v-6.848H0.489v8.861c0,1.111,0.9,2.012,2.016,2.012h24.967c1.115,0,2.016-0.9,2.016-2.012
+            v-8.861H25.462z"/>
+        <path d="M14.62,18.426l-5.764-6.965c0,0-0.877-0.828,0.074-0.828s3.248,0,3.248,0s0-0.557,0-1.416c0-2.449,0-6.906,0-8.723
+            c0,0-0.129-0.494,0.615-0.494c0.75,0,4.035,0,4.572,0c0.536,0,0.524,0.416,0.524,0.416c0,1.762,0,6.373,0,8.742
+            c0,0.768,0,1.266,0,1.266s1.842,0,2.998,0c1.154,0,0.285,0.867,0.285,0.867s-4.904,6.51-5.588,7.193
+            C15.092,18.979,14.62,18.426,14.62,18.426z"/>
+                        </svg>
+                      </a>
+                      {% endif %}
+                      {% if gestionnaire and item.date_parution %} <span style="color:red">parution le {{ item.date_parution }}</span>{% endif %}
+                      {{ item.description }}
+                </div>
+                {% if gestionnaire %}
+                <div class="fichiersDroite">
+                    <a href="{% url 'modifie_fichier' item.id %}">
+                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="27" height="27" viewBox="0 0 27 27">
+                            <title>edite</title>
+                            <path d="M 15 5 L 20 10 L 25 5 L 20 0 L 1 19 L 6 24 L 20 10 M 1 19 L 0 25 L 6 24 M 9 25 L 25 25" 
+                            stroke="black" stroke-width="1.2" fill="none" />
+                        </svg>
+                      </a>
+                      <a href="{% url 'modifie_ordre_fichier' item.id 'True' %}">
+                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+                          <title>haut</title>
+                          <path d="M16 10 l13 13 h3 l-16 -16 -16 16 h3 l13 -13z"></path>
+                        </svg>
+                      </a>
+                      <a href="{% url 'modifie_ordre_fichier' item.id 'False'%}">
+                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+                          <title>bas</title>
+                          <path d="M16 21l-13-13h-3l16 16 16-16h-3l-13 13z"></path>
+                        </svg>
+                      </a>
+                      <a href="{% url 'supprime_fichier' item.id %}">
+                        <svg class="svg-icon" style="width: 2em; height: 2em;vertical-align: middle;overflow: hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"><title>supprimer</title><path d="M408 448h48v320h-48zM568 448h48v320h-48z"  /><path d="M808 336a88.064 88.064 0 0 0-88-88h-104V224c0-39.68-32.32-72-72-72h-64c-39.68 0-72 32.32-72 72v24H304a88.064 88.064 0 0 0-88 88v56.032h64V872h464V392.032h64V336z m-352-112c0-13.216 10.784-24 24-24h64c13.216 0 24 10.784 24 24v24h-112V224z m240 600h-368V392.032h368V824z m64-479.968H264V336c0-22.048 17.952-40 40-40h416c22.048 0 40 17.952 40 40v8.032z"  /></svg>
+                      </a>
+                </div>
+                {% endif %}
+            </li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+
+{% endblock body %}

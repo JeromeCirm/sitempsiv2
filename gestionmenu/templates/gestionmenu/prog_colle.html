@@ -1,0 +1,45 @@
+{% extends 'gestionmenu/base.html' %}
+{% load static %}
+{% block body %}
+
+<h1> Math : Programme de colles
+    {% if gestionnaire %}
+    <a href="{% url 'ajout_prog_colle' id_menu %}">
+      <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
+          <title>ajout d'un fichier</title>
+          <path
+            d="M 10 0 L 10 20 M 0 10 L 20 10 M 10 0"
+            stroke="black" stroke-width="1.2" fill="none"
+          ></path>
+      </svg>
+    </a>
+    {% endif %}
+    </h1> 
+
+<DIV style="text-align:center">
+<DIV style="padding : 30px;display:inline-block;text-align:left"></DIV>
+{% for item in contenu %}
+<li>programme n° {{ item.numero }} <input name="alire" size=70 value="{{ item.description }}" disabled>
+{% if item.programme %} <a href="{%url 'download_prog' id_menu item.id %}"> Programme </a>{% endif %}
+{% if item.exercices %} <a href="{%url 'download_exos' id_menu item.id %}"> Exercices </a>{% endif %}
+{% if gestionnaire %}
+    <a href="{% url 'modifie_prog_colle' id_menu item.id %}">
+            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="27" height="27" viewBox="0 0 27 27">
+                <title>edite</title>
+                <path d="M 15 5 L 20 10 L 25 5 L 20 0 L 1 19 L 6 24 L 20 10 M 1 19 L 0 25 L 6 24 M 9 25 L 25 25" 
+                stroke="black" stroke-width="1.2" fill="none" />
+            </svg>
+          </a>
+           <a href="{% url 'supprime_prog_colle' id_menu item.id %}">
+            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+              <title>supprime</title>
+              <path
+                d="M27.314 6.019l-1.333-1.333-9.98 9.981-9.981-9.981-1.333 1.333 9.981 9.981-9.981 9.98 1.333 1.333 9.981-9.98 9.98 9.98 1.333-1.333-9.98-9.98 9.98-9.981z"
+              ></path>
+            </svg>
+          </a>
+{% endif %}<BR></li>
+{% endfor %}
+</DIV>
+</DIV>
+{% endblock %}

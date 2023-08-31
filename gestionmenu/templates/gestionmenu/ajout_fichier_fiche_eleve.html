@@ -1,0 +1,15 @@
+{% extends 'gestionmenu/base.html' %}
+
+{% block body %}
+<h1> ajout de fichier pour l'élève {{ login }} de l'année {{ annee }} </h1>
+<hr>
+
+<form method="POST" enctype="multipart/form-data" action="">
+    {% csrf_token %}
+    {{form.as_p}}
+    <input type="hidden" id="action" name="action" value="ajout">
+    <input type="hidden" id="annee" name="annee" value="{{ annee }}">
+    <input type="hidden" id="eleve" name="eleve" value="{{ eleve }}">
+    <input type="submit" value="Submit"/>
+</form>
+{% endblock body %}

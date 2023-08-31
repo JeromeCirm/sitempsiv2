@@ -1,0 +1,52 @@
+{% extends 'gestionmenu/base.html' %}
+
+{% block body %}
+<h1>Paramètres du compte</h1> 
+{% if interdit %} <span style="color:red"> Modification impossible pour ce compte </span>{% else %}
+{% if msg %} <span style="color:green">{{ msg }}</span><BR><BR> {% endif %}
+{% if changepassword %}
+    {% if changepasswordreussi %}
+    <span style="color:green">Changement de mot de passe réussi</span><BR>
+    {% else %}
+    <span style="color:red">Erreur lors du changement de mot de passe</span><BR>
+    {% endif %}
+{% endif%}
+<BR>
+<div class="textedinfo">
+      <form class="form" method="POST" action="">
+        {% csrf_token %}
+        <div >
+            <label for="password">Ancien mot de passe : </label>
+            <input name="password" type="password"/>
+          </div>
+          <div >
+            <label for="newpassword">Nouveau mot de passe : </label>
+            <input name="newpassword" type="password"/>
+          </div>
+          <div >
+            <label for="newpasswordconfirm">Confirmer le nouveau mot de passe : </label>
+            <input name="newpasswordconfirm" type="password"/>
+          </div><BR>
+          <input type="submit" value="changer le mot de passe">
+    </form>
+
+    <form class="form" method="POST" action="">
+      {% csrf_token %}<BR>
+      <div >
+          <label for="mail"> mail : </label>
+          <input name="mail" type="email" value="{{ mail }}"/>
+      </div> {% if autoriser_changement_nom %}
+      <div >
+        <label for="prenomusage"> prénom d'usage : </label>
+        <input name="prenomusage"  value="{{ prenomusage }}"/>
+    </div>
+    <div >
+      <label for="nomusage"> nom d'usage : </label>
+      <input name="nomusage" value="{{ nomusage }}"/>
+    </div> {% endif %}
+        <BR>
+        <input type="submit" value="Mettre à jour les paramètres">
+    </form> {% endif %}
+
+</div>
+{% endblock body %}

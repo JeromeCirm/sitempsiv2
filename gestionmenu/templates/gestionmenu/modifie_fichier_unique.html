@@ -1,0 +1,12 @@
+{% extends 'gestionmenu/base.html' %}
+
+{% block body %}
+<h1> gestion du fichier du menu {{ nommenu }}</h1>
+<hr>
+
+<form method="POST" enctype="multipart/form-data" action="">
+    {% csrf_token %}
+    {{form.as_p}}
+    <input type="submit" value="Submit"/>
+</form>
+{% endblock body %}

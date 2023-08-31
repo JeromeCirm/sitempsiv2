@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="layout__box">
+    <div class="layout__boxHeader">
+        <h2>Connexion au site : </h2>
+    </div>
+    
+    <div class="layout__body">
+      <form class="form" method="POST" action="">
+        {% csrf_token %}
+        <div class="form__group">
+          <label for="username">Nom d'utilisateur</label>
+          <input id="username" name="username" type="text" autofocus="True"/>
+        </div>
+        <div class="form__group">
+          <label for="password">Mot de passe</label>
+          <input name="password" type="password"/>
+        </div>
+
+        <button class="login-btn" type="submit">
+          Connexion
+        </button><BR><BR> {% if creation %}
+        Pas de compte? Création  <a href="{% url 'creation_compte' %}" class="creation-btn"> ici </a><BR> {% endif %} {% if recuperation %}
+        Mot de passe oublié ?  c'est par <a href="{% url 'recuperation_password' %}" class="creation-btn"> ici </a> {% endif %}
+      </form>
+    </div>
+
+  </div>
+
+
+
+{% endblock body %}

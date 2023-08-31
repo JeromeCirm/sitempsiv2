@@ -1,0 +1,60 @@
+{% extends 'gestionmenu/base.html' %}
+
+{% block body %}
+
+<BR>
+<DIV style="text-align:center">
+{% if eleves %}
+<DIV style="text-align:center">  Liste des mails des groupes d'élèves:<BR>
+    <DIV style="padding : 10px;display:inline-block;text-align:left">
+        {% for ungroupe in eleves %}
+        <input type="checkbox" id="checkbox{{ ungroupe.numero }}">
+        <input name="alire" size=7 value="groupe {{ ungroupe.numero }} " disabled>    
+        <input name="alire" size=140 value="{% for uneleve in ungroupe.eleves.all %} {{ uneleve.first_name }} {{ uneleve.last_name }};{% endfor %}" disabled>    <BR>
+        <input name="alire" id="mail{{ ungroupe.numero }}" size=150 value="{% for uneleve in ungroupe.eleves.all %} {{ uneleve.email }};{% endfor %}" disabled>    <BR>
+            {% endfor %}
+    </DIV>
+</DIV>  {% endif %}                 {{forloop.counter}}
+{% if profs %}     
+<DIV style="text-align:center">  Liste des mails des professeurs :<BR>
+    <DIV style="padding : 10px;display:inline-block;text-align:left">
+        {% for unitem in profs %}
+            <input type="checkbox" id="checkbox{{forloop.counter}}">
+            <input name="alire" size=20 value="{{ unitem.first_name }} {{ unitem.last_name }}" disabled>    
+            <input name="alire" id="mail{{forloop.counter}}" size=40 value="{{ unitem.email }};" disabled>    <BR>
+        {% endfor %}
+    </DIV>
+</DIV> 
+<DIV style="text-align:center">  Liste des mails des colleurs :<BR>
+    <DIV style="padding : 10px;display:inline-block;text-align:left">
+        {% for unitem in colleurs %}
+            <input type="checkbox" id="checkbox{{forloop.counter|add:nb_profs}}">
+            <input name="alire" size=20 value="{{ unitem.first_name }} {{ unitem.last_name }}" disabled>    
+            <input name="alire" id="mail{{forloop.counter|add:nb_profs}}" size=40 value="{{ unitem.email }};" disabled>    <BR>
+        {% endfor %}
+    </DIV>
+</DIV>    
+{% endif %}
+<BR>
+Cliquer sur <button id="buttonfalse" onclick="copie_mail(false)">  ce bouton </button> pour copier les mails choisis dans le presse_papier. <button id="buttontrue" onclick="copie_mail(true)">  ce bouton </button> pour avoir tous les mails
+</DIV> <BR><BR><BR>
+
+<script>
+
+function copie_mail(tous) {
+    var button=document.getElementById("button"+tous.toString())
+    button.innerHTML="en cours"
+    // on récupère tous les éléments pour lesquels id commence par "checkbox"
+    lescheckbox=document.querySelectorAll('input[id^="checkbox"]');
+    s=''
+    lescheckbox.forEach(function(element) {
+        if (element.checked || tous) {
+            item=document.getElementById("mail"+element.id.substring(8))
+            s=s+item.value
+        }
+    })
+    navigator.clipboard.writeText(s).then(() => {  button.innerHTML="copie terminée" })
+}
+
+</script>
+{% endblock body %}

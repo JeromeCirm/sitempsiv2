@@ -1,0 +1,53 @@
+{% extends 'gestionmenu/base.html' %}
+{% load gestionmenutags %}
+
+{% block body %}
+{% if prof %}  
+    {% csrf_token %} <DIV style="text-align:center"> Changer pour le colleur : <form method="POST" id='formcolleur' action="">{% csrf_token %}
+        <select id="colleur" onchange="this.form.submit()" name="colleur" type="select">
+            {% for item in listecolleurs %}
+            <option value="{{ item.username }}" {% if item.username == actuel.username %} selected {% endif %}> {{ item.first_name}} {{ item.last_name }}</option> {% endfor %}
+        </select> </form> ou l'élève : <form method="POST" id='formeleve' action="">{% csrf_token %}
+        <select id="eleve" onchange="this.form.submit()" name="eleve" type="select">
+            {% for item in listeeleves %}
+            <option value="{{ item.username }}"  {% if item.username == actuel.username %} selected {% endif %}> {{ item.first_name}} {{ item.last_name }} </option> {% endfor %}
+        </select></form> </DIV> {% endif %}
+<BR>  {% if type == "eleve" %}
+    <DIV style="text-align:center">  Colloscope de l'année pour {{ actuel.first_name}} {{ actuel.last_name }}:  <BR> <BR>
+
+        <DIV style="display:inline-block;text-align:left">
+            {% for key,value in colloscope %}
+            <input name="alire" class="inputmobilemarc5" value="semaine {{ key }}" >  {% for x in value %}   
+            <input name="alire" class="inputmobilemarc4" value="{{ x.1.matière }} avec {{ x.1.colleur.first_name }} {{ x.1.colleur.last_name }}, {{ x.1.jour }} à {{ x.1.horaire }} en {{ x.1.salle }}" >    <BR>
+            <input name="alire" class="inputmobilemarc5" value="" >   {% endfor %}  
+            <input name="alire" class="inputmobilemarc4" value="" >    <BR>
+                {% endfor %}
+        </DIV>
+    </DIV> {% elif type == "colleur" %}
+    <DIV style="text-align:center">  Colloscope de l'année pour {{ actuel.first_name}} {{ actuel.last_name }} : <BR> <BR>
+        <DIV style="padding : 10px;display:inline-block;text-align:left">
+            {% for key,value in colloscope %}
+            <input name="alire" class="inputmobilemarc5" value="semaine {{ key }}" >  {% for x in value %}   
+            
+            
+<!--
+            <input name="alire" class="inputmobilemarc4" value="groupe {{ x.numero }} : {% for y in x.eleves.all %} {{ y.first_name }} {{ y.last_name }},{% endfor %}" >    <BR>
+-->
+            
+            {% if x.0 == 'groupe' %} 
+             <input name="alire" class="inputmobilemarc4" value="groupe {{ x.1.numero }} {{ x.2.jour }} à {{ x.2.horaire }} en {{ x.2.salle }}: {% for y in x.1.eleves.all %} {{ y.first_name }} {{ y.last_name }},{% endfor %}" >
+            {% else %} 
+            <input name="alire" class="inputmobilemarc4" value="{% if x.1 == None %} créneau non attribué {% else %} {{ x.1.first_name }} {{ x.1.last_name }} {% endif %} {{ x.2.jour }} à {{ x.2.horaire }} en {{ x.2.salle }}">  
+            {% endif %} 
+            <br>
+
+            
+            <input name="alire" class="inputmobilemarc5" value="" >   {% endfor %}  
+            <input name="alire" class="inputmobilemarc4" value="" >    <BR>
+                {% endfor %}
+        </DIV>
+    </DIV> {% elif type == "rien" %}
+    <DIV style="text-align:center">  Colloscope non visible pour ce compte : <BR> <BR>
+    </DIV> {% endif %}
+
+{% endblock body %}
