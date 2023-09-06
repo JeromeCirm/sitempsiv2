@@ -114,7 +114,7 @@ def fichier_unique(request,id_menu,context):
         return render(request,'gestionmenu/fichier_unique.html',context)
     
 def initialisation(request,id_menu,context):
-    try: 
+    if True: #try: 
         if request.method=='POST':
             action=request.POST['action']
             if action in liste_initialisation:
@@ -124,7 +124,7 @@ def initialisation(request,id_menu,context):
                 debug("erreur nom fonction initialisation")
         context["lesactions"]=liste_initialisation
         return render(request,'gestionmenu/initialisation.html',context)
-    except:
+    #except:
         debug("erreur dans la fonction initialisation")
         return redirect('/home')
 
