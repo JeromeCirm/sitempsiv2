@@ -203,12 +203,12 @@ def importation_fiches_eleves(context,efface=False,remplace_officiel=True,impose
             annee=name[-8:-4]
             ext=name[-4:]
         else:
-            context["msg"].append('fichier '+name+' non traité.')
+            context["msg"].append('!!! fichier '+name+' non traité.')
             continue
         try:
             lafiche=Renseignements.objects.get(login=login,année=annee)
         except:
-            context["msg"].append('pas de fiche pour '+login+' en '+annee)
+            context["msg"].append('!!! pas de fiche pour '+login+' en '+annee)
             continue
         if ext=='json':
             try:
@@ -231,9 +231,9 @@ def importation_fiches_eleves(context,efface=False,remplace_officiel=True,impose
                         user.last_name=lafiche.nomofficiel
                         user.save()
                     except:
-                        context["msg"].append('erreur lors de l\'affectation prénom/nom usuel de '+name)
+                        context["msg"].append('!!! erreur lors de l\'affectation prénom/nom usuel de '+name)
             except:
-                context["msg"].append('erreur lors de la lecture de '+name)
+                context["msg"].append('!!! erreur lors de la lecture de '+name)
         elif ext=='.pdf':
             if efface:
                 FichierFiches.objects.filter(fiche=lafiche,nomfichier=name).delete()
@@ -243,9 +243,9 @@ def importation_fiches_eleves(context,efface=False,remplace_officiel=True,impose
             lepdf.fichier.save('private_files/transfert_fiche/'+name,File(f))
             lepdf.save() # utile?
         else:
-            context["msg"].append('fichier '+name+' non traité.')
+            context["msg"].append('!!! fichier '+name+' non traité.')
             continue
-        context["msg"].append('fichier '+name+' traité')
+        context["msg"].append('   fichier '+name+' traité')
 
 def importation_fiches_renseignements(context,efface=True):
     # importe à partir du répertoire private_files/fiches_renseignements.json
