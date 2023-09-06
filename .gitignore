@@ -2,3 +2,5 @@
 *_perso*
 db.sqlite3
 private_files/*
+base/migrations/*
+gestionmenu/migrations/*
