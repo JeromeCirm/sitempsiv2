@@ -154,6 +154,12 @@ def maj_semaines(context,liste,annee):
             semaine=semaine+unesemaine
         flag=not flag
 
+def supprime_creneaux(context,matiere=""):
+    try:
+        CreneauxColleurs.objects.filter(matière=matiere).delete()
+    except:
+        context["msg"].append("!!! impossible de supprimer les créneaux de "+matiere)
+
 def maj_creneaux_colleurs(context,liste,garde_ancien=False):
     if not garde_ancien:
         CreneauxColleurs.objects.all().delete()
