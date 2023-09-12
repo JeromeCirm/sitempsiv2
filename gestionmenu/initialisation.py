@@ -254,6 +254,8 @@ def importation_fiches_eleves(context,efface=False,remplace_officiel=True,impose
         context["msg"].append('   fichier '+name+' traité')
 
 def importation_fiches_renseignements(context,efface=True):
+    # !!!
+    # !!! ne gère pas une fiche présente si efface=False
     # importe à partir du répertoire private_files/fiches_renseignements.json
     # qui doit être le dump json d'une liste d'enregistrement de fiches Renseignement
     # on récupère les champs qui sont cohérents
