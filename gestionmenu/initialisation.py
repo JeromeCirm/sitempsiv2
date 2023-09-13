@@ -108,30 +108,45 @@ def maj_comptes_colleurs(context,mdp,dico,garde_ancien=False,oblige_changement_m
         context["msg"].append("!!! erreur dans la fonction maj_comptes_colleurs")
 
 def creation_menu_site(context,liste):
-    Menu.objects.all().delete()
-    ordre=0
-    for item in liste:
-        x=Menu(nom=item[0],fonction=item[1])
-        x.ordre=ordre
-        x.parent=0
-        x.save()
-        ordre+=1
-        id=x.pk
-        for y in item[2]:
-            x.gestionnaires.add(User.objects.get(username=y))
-        for y in item[3]:
-            x.groupes.add(y)
-        ordre_s=0
-        for subitem in item[4]:
-            x=Menu(nom=subitem[0],fonction=subitem[1])
-            x.ordre=ordre_s
-            x.parent=id
+    try:
+        Menu.objects.all().delete()
+        ordre=0
+        for item in liste:
+            x=Menu(nom=item[0],fonction=item[1])
+            x.ordre=ordre
+            x.parent=0
             x.save()
-            for y in subitem[2]:
-                x.gestionnaires.add(User.objects.get(username=y))
-            for y in subitem[3]:
-                x.groupes.add(y)
-            ordre_s+=1
+            ordre+=1
+            id=x.pk
+            for y in item[2]:
+                try:
+                    x.gestionnaires.add(User.objects.get(username=y))
+                except:
+                    context["msg"].append("!!! erreur lors de l'ajout de "+y+" comme gestionnaire du menu "+item[0])
+            for y in item[3]:
+                try:
+                    x.groupes.add(Group.objects.get(name=y))
+                except:
+                    context["msg"].append("!!! erreur lors de l'ajout de "+y+" comme groupe au menu "+item[0])                    
+            ordre_s=0
+            for subitem in item[4]:
+                x=Menu(nom=subitem[0],fonction=subitem[1])
+                x.ordre=ordre_s
+                x.parent=id
+                x.save()
+                for y in subitem[2]:
+                    try:
+                        x.gestionnaires.add(User.objects.get(username=y))
+                    except:
+                        context["msg"].append("!!! erreur lors de l'ajout de "+y+" comme gestionnaire du sous-menu "+subitem[0])
+                for y in subitem[3]:
+                    try:
+                        x.groupes.add(Group.objects.get(name=y))
+                    except:
+                        context["msg"].append("!!! erreur lors de l'ajout de "+y+" comme groupe au sous-menu "+subitem[0])     
+                ordre_s+=1
+    except:
+        context["msg"].append("!!! erreur lors de la création des menus")
 
 def trouve_premier_lundi_septembre(annee):
     jour=datetime.date(year=annee,month=9,day=1)
