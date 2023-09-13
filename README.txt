@@ -79,3 +79,5 @@ Dans l'ordre d'importance déroissante :
 
 Bonus rapide :
  - lire ses notes pour les colleurs?
+ - gérer non noté et l'export pronote
+ - gérer la philo
