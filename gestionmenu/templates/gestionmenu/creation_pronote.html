@@ -44,7 +44,7 @@ C15.092,18.979,14.62,18.426,14.62,18.426z"/>
         {% for item in enplus %}
         <li>
         <input name="nomeleve" class="inputmobilemarc1" value="{{ item.eleve }}" disabled>
-        <input name="note" class="inputmobilemarc2" value="{{ item.note }}" disabled> avec
+        <input name="note" class="inputmobilemarc2" value=" {% if item.note == -1 %} Absent(e) {% elif item.note == -2 %} Non noté(e)  {% else %} {{ item.note }} {% endif %}" disabled> avec
         <input name="colleur" class="inputmobilemarc1" value="{{ item.colleur }}" disabled> en semaine
         <input name="semaine" class="inputmobilemarc2" value="{{ item.semaine }}" disabled>
         <br>

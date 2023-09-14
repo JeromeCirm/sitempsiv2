@@ -242,21 +242,6 @@ def creation_comptes_prof(context):
 
 def init_menu(context):
     creation_groupe(context)
-    lesgroupes={}
-    for item in liste_menu:
-        gr=[]
-        for x in item[3]:
-            if x not in lesgroupes:
-                lesgroupes[x]=Group.objects.get(name=x)
-            gr.append(lesgroupes[x])
-        item[3]=gr
-        for subitem in item[4]:
-            gr=[]
-            for x in subitem[3]:
-                if x not in lesgroupes:
-                    lesgroupes[x]=Group.objects.get(name=x)
-                gr.append(lesgroupes[x])
-            subitem[3]=gr
     creation_menu_site(context,liste_menu)
     context["msg"].append(" ** fin de la création des menus")
 

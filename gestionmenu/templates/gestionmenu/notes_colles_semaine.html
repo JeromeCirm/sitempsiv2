@@ -12,7 +12,7 @@
             {% for item in lessemaines %}
             <option value="{{ item.numero }}" {% if item.numero == semaine.numero %}selected="selected"{% endif %}>n°- {{ item.numero }} commençant le {{ item.date }}</option> {% endfor %}
         </select>
-    </form><BR>
+    </form> ( A : Absent,   N : Non noté(e))<BR>
 
     <div id="lesnotes">
     </div>
@@ -68,7 +68,9 @@ function affiche_note(lesnotesliste,doublonsliste) {
         // label2.setAttribute('size',1)
         label2.setAttribute('class','inputmobilemarc2')
         if (note == -1) {
-            label2.value='Abs'
+            label2.value='A'
+        } else if (note == -2) {
+            label2.value='N'            
         } else {
             label2.value=note
         }
@@ -85,6 +87,11 @@ function affiche_note(lesnotesliste,doublonsliste) {
             unenote=doublonsliste[item][x]
             note=unenote["note"]
             colleur=unenote["colleur"]
+            if (note == -1) {
+                note='A'
+            } else if (note == -2) {
+                note='N'            
+            }
             doublons.innerHTML+=item+" : "+note+" avec "+colleur+", "
         }
     }

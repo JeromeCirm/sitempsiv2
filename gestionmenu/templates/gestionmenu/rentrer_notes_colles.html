@@ -125,6 +125,13 @@ select {
                     optionabs.setAttribute('selected','selected')
                 }                
                 select.appendChild(optionabs)
+                let optionnom=document.createElement('option')
+                optionnom.setAttribute('value',-2)
+                optionnom.innerHTML='Non noté'
+                if (record.note==-2) {
+                    optionnom.setAttribute('selected','selected')
+                }                
+                select.appendChild(optionnom)
                 for (let note=20;note>0;note--) {
                     let option=document.createElement('option')
                     option.setAttribute('value',note)
@@ -162,7 +169,14 @@ select {
                 if (record.note==-1) {
                     optionabs.setAttribute('selected','selected')
                 }                
-                select.appendChild(optionabs)                
+                select.appendChild(optionabs)   
+                let optionnom=document.createElement('option')
+                optionnom.setAttribute('value',-2)
+                optionnom.innerHTML='Non noté'
+                if (record.note==-2) {
+                    optionnom.setAttribute('selected','selected')
+                }                
+                select.appendChild(optionnom)                             
                 for (let note=20;note>0;note--) {
                     let option=document.createElement('option')
                     option.setAttribute('value',note)
@@ -205,7 +219,14 @@ select {
                 if (record.note==-1) {
                     optionabs.setAttribute('selected','selected')
                 }                
-                select.appendChild(optionabs)                
+                select.appendChild(optionabs)
+                let optionnom=document.createElement('option')
+                optionnom.setAttribute('value',-2)
+                optionnom.innerHTML='Non noté'
+                if (record.note==-2) {
+                    optionnom.setAttribute('selected','selected')
+                }                
+                select.appendChild(optionnom)                                
                 for (let note=20;note>0;note--) {
                     let option=document.createElement('option')
                     option.setAttribute('value',note)
@@ -235,6 +256,10 @@ select {
             optionabs.setAttribute('value',-1)
             optionabs.innerHTML='Abs'               
             select.appendChild(optionabs)
+            let optionnom=document.createElement('option')
+            optionnom.setAttribute('value',-2)
+            optionnom.innerHTML='Non noté'               
+            select.appendChild(optionnom)
             for (let note=20;note>0;note--) {
                 let option=document.createElement('option')
                 option.setAttribute('value',note)

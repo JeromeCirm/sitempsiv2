@@ -458,17 +458,21 @@ def modifie_prog_colle(request,id_menu,pk):
                 form=ProgColleForm(request.POST,instance=obj)
                 if form.is_valid():
                     form.save()
-            elif 'programme-clear' in request.POST:
+            elif 'programme-clear' in request.POST and obj.programme!=None:
                 obj.programme.delete()
             elif 'programme' in request.FILES:
+                if obj.programme!=None:
+                    obj.programme.delete()
                 form=ProgColleForm({'description':obj.description,'numero':obj.numero},request.FILES,instance=obj)
                 if form.is_valid():
                     new_record=form.save(commit=False)
                     new_record.nomprogramme=request.FILES['programme']
                     new_record.save()
-            elif 'exercices-clear' in request.POST:
+            elif 'exercices-clear' in request.POST and obj.exercices!=None:
                 obj.exercices.delete()                    
             elif 'exercices' in request.FILES:
+                if obj.exercices!=None:
+                    obj.exercices.delete()
                 form=ProgColleForm({'description':obj.description,'numero':obj.numero},request.FILES,instance=obj)
                 if form.is_valid():
                     new_record=form.save(commit=False)

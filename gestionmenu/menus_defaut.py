@@ -294,7 +294,12 @@ def creation_fichier_pronote(request,id_menu,context):
                 lesnotes=NotesColles.objects.filter(colleur__in=liste_colleurs,semaine__numero__gte=lasemaine,
                 semaine__numero__lte=min(semainefin.numero,lasemaine+ecart-1),eleve=user)
                 if len(lesnotes)>0:
-                    txt+=str(lesnotes[0].note)
+                    if lesnotes[0].note==-1:
+                        txt+='A'
+                    elif lesnotes[0].note==-2:
+                        txt+='N'
+                    else:
+                        txt+=str(lesnotes[0].note)
                 if len(lesnotes)>1:
                     enplus+=lesnotes[1:]
             txt+="\n"

@@ -8,7 +8,7 @@
 <div id="lesnotes">
     <ul>
         {% for item in contenu %}
-        <li>semaine {{ item.semaine }} : {% if item.note == -1 %} Absent(e) {% else %} {{ item.note }} {% endif %} avec {{ item.colleur }}</li>
+        <li>semaine {{ item.semaine }} : {% if item.note == -1 %} Absent(e) {% elif item.note == -2 %} Non noté(e)  {% else %} {{ item.note }} {% endif %} avec {{ item.colleur }}</li>
         {% endfor %}
     </ul>
 </div>
