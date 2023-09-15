@@ -294,9 +294,12 @@ def creation_semaines(context):
     context["msg"].append(" ** fin de la création des semaines.")
 
 def creation_groupes_creneaux_colloscope(context):
-    maj_creneaux_colleurs(context,creneaux_math)
+    supprime_creneaux(context,matiere="math")
+    supprime_creneaux(context,matiere="physique")
+    supprime_creneaux(context,matiere="anglais")
+    maj_creneaux_colleurs(context,creneaux_math,True)
     maj_creneaux_colleurs(context,creneaux_physique,True)
-    maj_creneaux_colleurs(context,creneaux_anglais,True)
+    maj_creneaux_colleurs(context,creneaux_anglais,True)    
     maj_groupes_colles(context,groupes_colles)
     liste=[]
     for semaine in range(1,31):
