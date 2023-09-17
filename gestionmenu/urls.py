@@ -41,4 +41,6 @@ urlpatterns = urlpatterns_perso+[
     path('action_creneaux_individuels',views.action_creneaux_individuels,name='action_creneaux_individuels'),
     path('recuperation_creneaux_individuels_gestionnaire',views.recuperation_creneaux_individuels_gestionnaire,name='recuperation_creneaux_individuels_gestionnaire'),
     path('action_creneaux_individuels_gestionnaire',views.action_creneaux_individuels_gestionnaire,name='action_creneaux_individuels_gestionnaire'),
+    path('maj_commentaire_notes_colles',views.maj_commentaire_notes_colles,name='maj_commentaire_notes_colles'),
+    path('recupere_commentaire_notes_colles',views.recupere_commentaire_notes_colles,name='recupere_commentaire_notes_colles'),
     ]

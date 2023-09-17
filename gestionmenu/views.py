@@ -506,11 +506,16 @@ def recuperation_notes_colles(request):
                     notes=NotesColles.objects.filter(semaine=semaine,colleur__in=lescolleurs)
                     doublons={}
                     for x in notes:
+                        try:
+                            lecom=CommentaireColle.objects.get(notecolle=x)
+                            lecom_id=lecom.id
+                        except:
+                            lecom_id=None
                         if lesnotes[joli_nom(x.eleve)]=='':
-                            lesnotes[joli_nom(x.eleve)]={"colleur":joli_nom(x.colleur),"note":x.note}
+                            lesnotes[joli_nom(x.eleve)]={"colleur":joli_nom(x.colleur),"note":x.note,"lecom_id":lecom_id}
                         else:
                             if joli_nom(x.eleve) not in doublons: doublons[joli_nom(x.eleve)]=[]
-                            doublons[joli_nom(x.eleve)].append({"colleur":joli_nom(x.colleur),"note":x.note})
+                            doublons[joli_nom(x.eleve)].append({"colleur":joli_nom(x.colleur),"note":x.note,"lecom_id":lecom_id})
                     response_data["lesnotes"]=lesnotes
                     response_data["doublons"]=doublons
                 else:
@@ -539,7 +544,14 @@ def recuperation_notes_colles(request):
                         for eleve in item.groupe.eleves.all().order_by("username"):
                             try:
                                 lanote=notes.get(eleve=User.objects.get(username=eleve.username),creneau=item.creneau)
-                                liste.append({"user":eleve.username,"eleve": joli_nom(eleve),"note":lanote.note,"creneau":item.creneau.id})
+                                try:
+                                    lecom=CommentaireColle.objects.get(notecolle=lanote)
+                                    lecom_present=True
+                                    lecom_id=lecom.id
+                                except:
+                                    lecom_present=False
+                                    lecom_id=None
+                                liste.append({"lecom_present":lecom_present,"lecom_id":lecom_id,"idnote" : lanote.id,"user":eleve.username,"eleve": joli_nom(eleve),"note":lanote.note,"creneau":item.creneau.id})
                                 idnotes.append(lanote.id)
                             except:
                                 liste.append({"user":eleve.username,"eleve":joli_nom(eleve),"note":'',"creneau":item.creneau.id})
@@ -550,14 +562,28 @@ def recuperation_notes_colles(request):
                     if item.eleve!=None:
                         try:
                             lanote=notes.get(eleve=User.objects.get(username=item.eleve.username),creneau=item.creneau)
-                            notesindiv.append({"user":item.eleve.username,"eleve": joli_nom(item.eleve),"note":lanote.note,"creneau":item.creneau.id})
+                            try:
+                                    lecom=CommentaireColle.objects.get(notecolle=lanote)
+                                    lecom_present=True
+                                    lecom_id=lecom.id
+                            except:
+                                    lecom_present=False
+                                    lecom_id=None
+                            notesindiv.append({"lecom_present":lecom_present,"lecom_id":lecom_id,"idnote" : lanote.id,"user":item.eleve.username,"eleve": joli_nom(item.eleve),"note":lanote.note,"creneau":item.creneau.id})
                             idnotes.append(lanote.id)
                         except:
                             notesindiv.append({"user":item.eleve.username,"eleve": joli_nom(item.eleve),"note":'',"creneau":item.creneau.id})
                 autresnotes=[]
                 lesnotes=notes.exclude(id__in=idnotes)
                 for item in lesnotes:
-                    autresnotes.append({"user":item.eleve.username,"eleve":joli_nom(item.eleve),"note":item.note,"idnote" : item.id})
+                    try:
+                        lecom=CommentaireColle.objects.get(notecolle=item)
+                        lecom_present=True
+                        lecom_id=lecom.id
+                    except:
+                        lecom_present=False
+                        lecom_id=None                   
+                    autresnotes.append({"lecom_present":lecom_present,"lecom_id":lecom_id,"user":item.eleve.username,"eleve":joli_nom(item.eleve),"note":item.note,"idnote" : item.id})
                 leseleves=User.objects.filter(groups=groupe_eleves).order_by("username")
                 response_data["notessemaine"]=notessemaine
                 response_data["notesindiv"]=notesindiv
@@ -910,3 +936,41 @@ def action_creneaux_individuels_gestionnaire(request):
     except:
         debug("erreur dans action_creneaux_individuels")
     return HttpResponse(json.dumps(response_data), content_type="application/json")      
+
+@auth(None)
+def maj_commentaire_notes_colles(request):
+    response_data = {}
+    try:
+        lanote=NotesColles.objects.get(id=request.POST["id_colle"])
+        if lanote.colleur==request.user: # à modifier avec les gestionnaires? sans doute non
+            texte=request.POST['texte']
+            try:
+                lecom=CommentaireColle.objects.get(notecolle=lanote)
+                if texte!="":
+                    lecom.text=texte
+                    lecom.save()
+                else:
+                    lecom.delete()
+            except:
+                if texte!="":
+                    lecom=CommentaireColle(notecolle=lanote,text=texte)
+                    lecom.save()
+        else:
+            debug("tentative de piratage maj_commentaire_notes_colles")
+    except:
+        debug("erreur dans maj_commentaire_notes_colles")
+    return HttpResponse(json.dumps(response_data), content_type="application/json")      
+
+@auth(None)
+def recupere_commentaire_notes_colles(request):
+    response_data = {}
+    try:
+        lecom=CommentaireColle.objects.get(id=request.POST["id_com"])
+        if lecom.notecolle.colleur==request.user or est_gestionnaire_colle(request.user,lecom.notecolle.colleur): 
+            response_data["texte"]=lecom.text
+        else:
+            debug("tentative de piratage recupere_commentaire_notes_colles")
+    except:
+        response_data["texte"]=""
+        debug("erreur dans recupere_commentaire_notes_colles ou bien commentaire vide")
+    return HttpResponse(json.dumps(response_data), content_type="application/json") 

@@ -34,7 +34,9 @@
 select {
     margin : 5px;
 }
+
 </style>
+
 <script>
     let semaine=document.getElementById("semaine")
     let colleur=document.getElementById("colleur")
@@ -73,7 +75,6 @@ select {
             noteselect=document.getElementById('select_ajout_'+eleve)
         }
         note=noteselect.options[noteselect.selectedIndex].value
-        console.log(eleve,type,info,note)
         var formData = new FormData();
         formData.append('semaine', semaine.value);
         formData.append('eleve', eleve);
@@ -113,6 +114,20 @@ select {
                 label.setAttribute('size',20)
                 label.value=record.eleve
                 notessemainediv.appendChild(label)
+                let com=document.createElement('button')
+                com.setAttribute('type','button')
+                com.innerHTML='T'
+                if ( record.note != "" ) {
+                    if (record.lecom_present) {
+                        com.setAttribute('style','color:black;background-color:lightgray')
+                    } else {
+                        com.setAttribute('style','color:red;background-color:lightgray')
+                    }
+                    com.setAttribute('onclick','maj_commentaire("'+record.idnote +'","'+record.lecom_id+'","'+record.eleve+'")')
+                } else {
+                    com.setAttribute('style','color:lightgray;background-color:lightgray')
+                }
+                notessemainediv.appendChild(com)
                 let select=document.createElement('select')
                 let option=document.createElement('option')
                 option.setAttribute('value','')
@@ -158,6 +173,20 @@ select {
                 label.setAttribute('size',20)
                 label.value=record.eleve
                 notessemainediv.appendChild(label)
+                let com=document.createElement('button')
+                com.setAttribute('type','button')
+                com.innerHTML='T'
+                if ( record.note != "" ) {
+                    if (record.lecom_present) {
+                        com.setAttribute('style','color:black;background-color:lightgray')
+                    } else {
+                        com.setAttribute('style','color:red;background-color:lightgray')
+                    }
+                    com.setAttribute('onclick','maj_commentaire("'+record.idnote +'","'+record.lecom_id+'","'+record.eleve+'")')
+                } else {
+                    com.setAttribute('style','color:lightgray;background-color:lightgray')
+                }
+                notessemainediv.appendChild(com)
                 let select=document.createElement('select')
                 let option=document.createElement('option')
                 option.setAttribute('value','')
@@ -208,6 +237,20 @@ select {
                 label.setAttribute('size',20)
                 label.value=record.eleve
                 notessemainediv.appendChild(label)
+                let com=document.createElement('button')
+                com.setAttribute('type','button')
+                com.innerHTML='T'
+                if ( record.note != "" ) {
+                    if (record.lecom_present) {
+                        com.setAttribute('style','color:black;background-color:lightgray')
+                    } else {
+                        com.setAttribute('style','color:red;background-color:lightgray')
+                    }
+                    com.setAttribute('onclick','maj_commentaire("'+record.idnote +'","'+record.lecom_id+'","'+record.eleve+'")')
+                } else {
+                    com.setAttribute('style','color:lightgray;background-color:lightgray')
+                }
+                notessemainediv.appendChild(com)
                 let select=document.createElement('select')
                 let option=document.createElement('option')
                 option.setAttribute('value','')
@@ -272,6 +315,53 @@ select {
         });
     }
 
+function maj_commentaire(id_colle,lecom_id,eleve) {
+    //new_texte=prompt("commentaire pour la colle : ",texte)
+    var formData = new FormData();
+        formData.append('id_com', lecom_id);
+        csrf=document.getElementsByName('csrfmiddlewaretoken')[0] 
+        formData.append('csrfmiddlewaretoken',csrf.value)
+        fetch("/recupere_commentaire_notes_colles", {
+          method : 'POST',
+          headers : {
+            'Accept': 'application/json, text/plain, */*',
+            },
+            body: formData
+        }).then(function(res){ return res.json();})
+          .then(function(res){
+            
+    var new_texte;
+    bootbox.prompt({
+                                title: 'Commentaire pour la colle de '+eleve,
+                                inputType: 'textarea',
+                                value : res["texte"],
+                                callback: function (new_texte) {
+    if (new_texte != null) {
+        var formData = new FormData();
+        formData.append('id_colle', id_colle);
+        formData.append('texte', new_texte);
+        csrf=document.getElementsByName('csrfmiddlewaretoken')[0]
+        formData.append('csrfmiddlewaretoken',csrf.value)
+        fetch("/maj_commentaire_notes_colles", {
+          method : 'POST',
+          headers : {
+            'Accept': 'application/json, text/plain, */*',
+            },
+            body: formData
+        }).then(function(res){ return res.json();})
+          .then(function(res){
+            maj_information()
+           })
+            .catch(function(err){ console.log('Erreur requête', err);});
+    } 
+}
+                                });
+                            })
+            .catch(function(err){ console.log('Erreur requête', err);});
+
+}
+
 maj_information()
-    </script>
+
+</script>
 {% endblock body %}

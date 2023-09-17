@@ -50,11 +50,12 @@ function affiche_note(lesnotesliste,doublonsliste) {
     /* ordonner les élèves par usename */
     lesnotes.innerHTML=""
     for (item in lesnotesliste) {
+        let lanote=lesnotesliste[item]
         let colleur=""
         let note=""
         if (lesnotesliste[item]!='') {
-            colleur="avec "+lesnotesliste[item]["colleur"]
-            note=lesnotesliste[item]["note"]
+            colleur="avec "+lanote.colleur
+            note=lanote.note
         }
         let bnote=document.createElement('div')
         bnote.setAttribute('class','divtableau')
@@ -75,6 +76,20 @@ function affiche_note(lesnotesliste,doublonsliste) {
             label2.value=note
         }
         bnote.appendChild(label2)
+        let com=document.createElement('button')
+        com.setAttribute('type','button')
+        com.innerHTML='T'
+        if ( lanote.note != "" ) {
+                    if (lanote.lecom_id != null) {
+                        com.setAttribute('style','color:black;background-color:lightgray')
+                        com.setAttribute('onclick','lecture_commentaire("'+lanote.idnote +'","'+lanote.lecom_id+'","'+item+'")')
+                    } else {
+                        com.setAttribute('style','color:lightgray;background-color:lightgray')
+                    }
+                 } else {
+                    com.setAttribute('style','color:lightgray;background-color:lightgray')
+                }
+        bnote.appendChild(com)        
         let label3=document.createElement('input')
         // label3.setAttribute('size',10)
         label3.setAttribute('class','inputmobilemarc3')
@@ -84,18 +99,91 @@ function affiche_note(lesnotesliste,doublonsliste) {
     doublons.innerHTML=""
     for (item in doublonsliste) {
         for (x in doublonsliste[item]) {
-            unenote=doublonsliste[item][x]
-            note=unenote["note"]
-            colleur=unenote["colleur"]
+            lanote=doublonsliste[item][x]
+            note=lanote.note
+            colleur=lanote.colleur
             if (note == -1) {
                 note='A'
             } else if (note == -2) {
                 note='N'            
             }
-            doublons.innerHTML+=item+" : "+note+" avec "+colleur+", "
+            //doublons.innerHTML+=item+" : "+note+" avec "+colleur+", "
+
+            let bnote=document.createElement('div')
+        bnote.setAttribute('class','divtableau')
+        doublons.appendChild(bnote)
+        let label=document.createElement('input')
+        // label.setAttribute('size',8)
+        label.setAttribute('class','inputmobilemarc1')
+        label.value=item
+        bnote.appendChild(label)
+        let label2=document.createElement('input')
+        // label2.setAttribute('size',1)
+        label2.setAttribute('class','inputmobilemarc2')
+        if (note == -1) {
+            label2.value='A'
+        } else if (note == -2) {
+            label2.value='N'            
+        } else {
+            label2.value=note
+        }
+        bnote.appendChild(label2)
+        let com=document.createElement('button')
+        com.setAttribute('type','button')
+        com.innerHTML='T'
+        if ( lanote.note != "" ) {
+                    if (lanote.lecom_id != null) {
+                        com.setAttribute('style','color:black;background-color:lightgray')
+                        com.setAttribute('onclick','lecture_commentaire("'+lanote.idnote +'","'+lanote.lecom_id+'","'+item+'")')
+                    } else {
+                        com.setAttribute('style','color:lightgray;background-color:lightgray')
+                    }
+                 } else {
+                    com.setAttribute('style','color:lightgray;background-color:lightgray')
+                }
+        bnote.appendChild(com)        
+        let label3=document.createElement('input')
+        // label3.setAttribute('size',10)
+        label3.setAttribute('class','inputmobilemarc3')
+        label3.value=colleur
+        bnote.appendChild(label3)
+
+
         }
     }
 }
+
+function lecture_commentaire(id_colle,lecom_id,eleve) {
+    //new_texte=prompt("commentaire pour la colle : ",texte)
+    var formData = new FormData();
+        formData.append('id_com', lecom_id);
+        csrf=document.getElementsByName('csrfmiddlewaretoken')[0] 
+        formData.append('csrfmiddlewaretoken',csrf.value)
+        fetch("/recupere_commentaire_notes_colles", {
+          method : 'POST',
+          headers : {
+            'Accept': 'application/json, text/plain, */*',
+            },
+            body: formData
+        }).then(function(res){ return res.json();})
+          .then(function(res){
+            
+    var new_texte;
+    bootbox.prompt({
+                                title: 'Commentaire pour la colle de '+eleve,
+                                inputType: 'textarea',
+                                value : res["texte"],
+                                callback: function (new_texte) {
+ 
+}
+                                });
+                            })
+            .catch(function(err){ console.log('Erreur requête', err);});
+
+}
+
+
+
 
 recupere_notes()
 </script>

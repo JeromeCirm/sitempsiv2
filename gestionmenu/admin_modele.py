@@ -46,6 +46,9 @@ class Colloscope_individuelAdmin(admin.ModelAdmin):
 class Gestion_colles_individuellesAdmin(admin.ModelAdmin):
     pass
 
+class CommentaireColleAdmin(admin.ModelAdmin):
+    pass
+
 admin.site.register(NotesColles,NotesCollesAdmin)
 admin.site.register(Divers,DiversAdmin)
 admin.site.register(Menu,MenuAdmin)
@@ -58,4 +61,5 @@ admin.site.register(Colloscope,ColloscopeAdmin)
 admin.site.register(Renseignements,RenseignementsAdmin)
 admin.site.register(Colloscope_individuel,Colloscope_individuelAdmin)
 admin.site.register(Gestion_colles_individuelles,Gestion_colles_individuellesAdmin)
+admin.site.register(CommentaireColle,CommentaireColleAdmin)
 
