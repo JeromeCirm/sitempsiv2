@@ -197,11 +197,13 @@ def gestion_delete_prog_file(sender, instance, using, **kwargs):
     except:
         pass
 
-#class CommentaireColle(models.Model):
-#    notecolle=models.ForeignKey(NotesColles,on_delete=models.CASCADE,null=True,blank=True,default=None)
-#    colle=models.ForeignKey(Colloscope,on_delete=models.CASCADE,null=True,blank=True,default=None)
-#    text=models.CharField(max_length=1000,null=True,blank=True)
-#    def uploadpath(self,filename):
-#        return 'private_files/commentairescolles/'+str(self.id)+extension(self.nomfichier)
-#    fichier=models.FileField(null=True,blank=True,upload_to=uploadpath)
-#    nomfichier=models.CharField(max_length=100,null=True,blank=True)
+class CommentaireColle(models.Model):
+   notecolle=models.ForeignKey(NotesColles,on_delete=models.CASCADE,null=True,blank=True,default=None)
+   # notecolle en cas de commentaire pour la note d'un élève, inutile sinon
+   colle=models.ForeignKey(Colloscope,on_delete=models.CASCADE,null=True,blank=True,default=None) 
+   # colle en cas de commentaire pour un groupe entier, inutile sinon
+   text=models.CharField(max_length=1000,null=True,blank=True)
+   def uploadpath(self,filename):
+       return 'private_files/commentairescolles/'+str(self.id)+extension(self.nomfichier)
+   fichier=models.FileField(null=True,blank=True,upload_to=uploadpath)
+   nomfichier=models.CharField(max_length=100,null=True,blank=True)
