@@ -502,7 +502,9 @@ width: 20%;
 .inputmobilemarc8long{
   width: 1154px;
 }
-
+.inputmobilemarc10{
+  width: 220px;
+}
 .divtableau{
   /* display: block; */
   display: inline-flex;
@@ -577,6 +579,10 @@ padding: 5px;
 .inputmobilemarcfacultatif{
   display: none;
 }
+.inputmobilemarc10{
+  width: 175px;
+}
+
 .divtableau{
 }
 }

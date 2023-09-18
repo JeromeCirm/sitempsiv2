@@ -143,9 +143,10 @@ def contacts(request,id_menu,context):
     return render(request,'gestionmenu/contacts.html',context)
 
 def programme_colle(request,id_menu,context):
-    progs=ProgColle.objects.values()
+    progs=ProgColle.objects.filter(menu__id=id_menu).values()
     context["id_menu"]=id_menu
     context["contenu"]=progs
+    context["titre"]=Menu.objects.get(id=id_menu).nom
     context['gestionnaire']=est_gestionnaire_menu(request.user,Menu.objects.get(id=id_menu))
     return render(request,'gestionmenu/prog_colle.html',context)
 
