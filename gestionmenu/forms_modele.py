@@ -13,6 +13,9 @@ class FichierForm(ModelForm):
     class Meta:
         model=Fichier
         fields=['description','fichier']
+        widgets={
+             'description' : forms.Textarea(attrs={'style':'width:80%'})
+        }
 
 class FichierUniqueForm(ModelForm):
     class Meta:
@@ -23,6 +26,9 @@ class FichierFormDescription(ModelForm):
     class Meta:
         model=Fichier
         fields=['description']
+        widgets={
+             'description' : forms.Textarea(attrs={'style':'width:80%'})
+        }        
 
 class FichierFormFichier(ModelForm):
     class Meta:

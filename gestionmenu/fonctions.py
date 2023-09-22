@@ -23,9 +23,12 @@ else:
         pass
 
 def joli_nom(user):  # renvoie le login ou   prénom+nom si cela a été renseigné
-    if user.last_name!="":
-        return user.first_name+" "+user.last_name
-    return user.username
+    try:
+        if user.last_name!="":
+            return user.first_name+" "+user.last_name
+        return user.username
+    except:
+        return "vide"
 
 def date_fr(date,annee=False):
     # transforme la date en francais, avec ou sans l'année
@@ -140,7 +143,7 @@ def semaine_en_cours():
         # pas de semaines créées pour l'instant
         return None
 
-def informations_colle_semaine(user,semaine=None):
+def informations_colle_semaine_eleve(user,semaine=None):
     # renvoie une list de messages à afficher concernant les colles de la semaine, les TD, etc.. de l'éleve
     if semaine==None:
         semaine=semaine_en_cours() # on récupère la semaine en cours
@@ -154,6 +157,22 @@ def informations_colle_semaine(user,semaine=None):
     for item in lescolles : 
         colle=item.creneau
         msg.append("colle de "+colle.matière+" avec "+joli_nom(colle.colleur)+" "+colle.jour+" à "+colle.horaire+" en "+colle.salle)
+    return msg 
+
+def informations_colle_semaine_colleur(user,semaine=None):
+    # renvoie une list de messages à afficher concernant les colles de la semaine du colleur
+    if semaine==None:
+        semaine=semaine_en_cours() # on récupère la semaine en cours
+    lescreneaux=CreneauxColleurs.objects.filter(colleur=user)
+    lescolles=Colloscope.objects.filter(semaine=semaine,creneau__in=lescreneaux)
+    msg=[]
+    for item in lescolles : 
+        colle=item.creneau
+        msg.append("Groupe "+str(item.groupe.numero)+" "+colle.jour+" à "+colle.horaire+" en "+colle.salle)
+    lescolles=Colloscope_individuel.objects.filter(semaine=semaine,creneau__in=lescreneaux)
+    for item in lescolles : 
+        colle=item.creneau
+        msg.append(joli_nom(item.eleve)+" "+colle.jour+" à "+colle.horaire+" en "+colle.salle)
     return msg 
 
 def auth_prog_colle_math(request):

@@ -34,9 +34,9 @@
                         </svg>
                       </a>
                       {% endif %}
-                      {% if gestionnaire and item.date_parution %} <span style="color:red">parution le {{ item.date_parution }}</span>{% endif %}
-                      {{ item.description }}
-                </div>
+                      {% if gestionnaire and item.date_parution %} <span style="color:red">Parution le {{ item.date_parution }}</span>{% endif %}
+                      {% for line in item.description %} {{ line }} <br> {% endfor %}
+                    </div>
                 {% if gestionnaire %}
                 <div class="fichiersDroite">
                     <a href="{% url 'modifie_fichier' item.id %}">

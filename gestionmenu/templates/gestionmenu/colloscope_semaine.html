@@ -20,6 +20,41 @@
 {% endif %}
 </DIV>
 
+<div class="modal fade" id="myModal" role="dialog" tabindex="-1"  aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 id="modal_titre" class="modal-title w-100 font-weight-bold">Modification du créneau : </h4>
+      </div>
+      <div class="modal-body mx-3">
+        <input id="modal_id" hidden >
+        <div class="md-form mb-4">
+            <i class="fas fa-lock prefix grey-text"></i>
+            <label for="modal_jour">jour : </label>
+            <input id="modal_jour" type="texte">
+          </div>
+  
+        <div class="md-form mb-4">
+          <i class="fas fa-envelope prefix grey-text"></i>
+          <label for="modal_salle">salle : </label>
+          <input id="modal_salle" type="texte">
+        </div>
+
+        <div class="md-form mb-4">
+          <i class="fas fa-lock prefix grey-text"></i>
+          <label for="modal_heure">heure : </label>
+          <input id="modal_heure" type="texte">
+        </div>
+
+      </div>
+      <div class="modal-footer d-flex justify-content-center">
+        <button class="btn btn-success" data-dismiss="modal" onclick="valide_modif_creneau()"> Valider </button>
+        <button type="button" class="btn btn-danger" data-dismiss="modal"> Annuler </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
     let indic_semaine=document.getElementById("indic_semaine")
     let informations=document.getElementById("informations")
@@ -55,6 +90,13 @@
                 item.setAttribute('class','inputmobilemarc5') // marc
                 indic_semaine.appendChild(item)
                 informations[key].forEach(function (u) {
+                    let com=document.createElement('button')
+                    com.setAttribute('type','button')
+                    com.innerHTML='M'
+                    com.setAttribute('style','color:black;background-color:lightgray')
+                    com.setAttribute('onclick','modif_creneau('+u[5]+',\''+u[0]+" "+key+" avec "+u[1]+" à "+u[2]+" en "+u[3]+" ("+u[4]+")"+'\',"'
+                           +key+'","'+u[2]+'","'+u[3]+'")')
+                    indic_semaine.appendChild(com)                    
                     var item=document.createElement('input')
                     item.value=u[0]+" avec "+u[1]+" à "+u[2]+" en "+u[3]+" ("+u[4]+")"
                     item.disabled
@@ -86,6 +128,13 @@
                 item.setAttribute('class','inputmobilemarc5')
                 indic_semaine.appendChild(item)
                 informations["autre_jour"].forEach(function (u) {
+                    let com=document.createElement('button')
+                    com.setAttribute('type','button')
+                    com.innerHTML='M'
+                    com.setAttribute('style','color:black;background-color:lightgray')
+                    com.setAttribute('onclick','modif_creneau('+u[6]+',\''+u[0]+" "+u[5]+" avec "+u[1]+" à "+u[2]+" en "+u[3]+" ("+u[4]+")"+'\',"'
+                           +u[5]+'","'+u[2]+'","'+u[3]+'")')
+                    indic_semaine.appendChild(com)                    
                     var item=document.createElement('input')
                     item.value=u[0]+" avec "+u[1]+" à "+u[2]+" en "+u[3]+" ("+u[4]+" "+u[5]+")"
                     item.disabled
@@ -110,6 +159,42 @@
             }
     }
     
+var modal_id= document.getElementById("modal_id")
+var modal_jour= document.getElementById("modal_jour")
+var modal_salle= document.getElementById("modal_salle")
+var modal_heure= document.getElementById("modal_heure")
+var modal_titre= document.getElementById("modal_titre")
+
+function modif_creneau(id_creneau,txt,jour,heure,salle) { 
+    modal_id.value=id_creneau;
+    modal_titre.innerHTML=txt;
+    modal_jour.value=jour; 
+    modal_salle.value=salle; 
+    modal_heure.value=heure; 
+    $("#myModal").modal();                     
+}
+
+function valide_modif_creneau() {
+    var formData = new FormData();
+    formData.append('id', modal_id.value);
+    formData.append('jour', modal_jour.value);
+    formData.append('salle', modal_salle.value);
+    formData.append('horaire', modal_heure.value);
+    csrf=document.getElementsByName('csrfmiddlewaretoken')[0]
+    formData.append('csrfmiddlewaretoken',csrf.value)
+    fetch("/modifie_creneau", {
+        method : 'POST',
+        headers : {
+            'Accept': 'application/json, text/plain, */*',
+        },
+        body: formData
+    }).then(function(res){ return res.json();}).then(function(res){
+        maj_informations()
+    }).catch(function(err){ console.log('Erreur requête', err);});
+}
+
+
+
     maj_informations()
     </script>
 

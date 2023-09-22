@@ -51,11 +51,11 @@ def home(request):
     try:
         context={"menu":menu_navigation(request)}
         context["titresite"]=TITRE_SITE
+        lessemaines=Semaines.objects.all().order_by("numero")
+        context["lessemaines"]=[{"numero":x.numero,"date":date_fr(x.date,True)} for x in lessemaines]
         lesgroupes=request.user.groups.all()
         if groupe_eleves in lesgroupes:
             context["eleve"]=True
-            lessemaines=Semaines.objects.all().order_by("numero")
-            context["lessemaines"]=[{"numero":x.numero,"date":date_fr(x.date,True)} for x in lessemaines]
             try:
                 context["annonce"]=Divers.objects.get(label="annonce").contenu
             except:
@@ -91,7 +91,11 @@ def recuperation_informations_home(request):
         lesgroupes=request.user.groups.all()
         if groupe_eleves in lesgroupes:
             lasemaine=Semaines.objects.get(numero=request.POST["semaine"])  
-            msg=informations_colle_semaine(request.user,lasemaine)
+            msg=informations_colle_semaine_eleve(request.user,lasemaine)
+            response_data["informations"]=msg
+        elif est_colleur(request.user):
+            lasemaine=Semaines.objects.get(numero=request.POST["semaine"])  
+            msg=informations_colle_semaine_colleur(request.user,lasemaine)
             response_data["informations"]=msg
     except:
         debug("erreur dans recuperation_informations_home")
@@ -660,23 +664,23 @@ def recuperation_colloscope_semaine(request):
             for unecolle in lescolles:
                 cr=unecolle.creneau
                 if cr.jour in dico_semaine:
-                    dico_semaine[cr.jour].append(["Groupe "+str(unecolle.groupe.numero),cr.colleur.first_name+" "+cr.colleur.last_name,cr.horaire,cr.salle,cr.matière])
+                    dico_semaine[cr.jour].append(["Groupe "+str(unecolle.groupe.numero),cr.colleur.first_name+" "+cr.colleur.last_name,cr.horaire,cr.salle,cr.matière,unecolle.id])
                 else:
-                    autre_jour.append(["Groupe "+str(unecolle.groupe.numero),cr.colleur.first_name+" "+cr.colleur.last_name,cr.horaire,cr.salle,cr.matière,cr.jour])
+                    autre_jour.append(["Groupe "+str(unecolle.groupe.numero),cr.colleur.first_name+" "+cr.colleur.last_name,cr.horaire,cr.salle,cr.matière,cr.jour,unecolle.id])
             dico_semaine["autre_jour"]=autre_jour
             lesindividuelles=Colloscope_individuel.objects.filter(semaine=lasemaine)
             for unecolle in lesindividuelles:
                 cr=unecolle.creneau
                 if cr.jour in dico_semaine:
                     if unecolle.eleve!=None:
-                        dico_semaine[cr.jour].append([unecolle.eleve.first_name+" "+unecolle.eleve.last_name,cr.colleur.first_name+" "+cr.colleur.last_name,cr.horaire,cr.salle,cr.matière])
+                        dico_semaine[cr.jour].append([unecolle.eleve.first_name+" "+unecolle.eleve.last_name,cr.colleur.first_name+" "+cr.colleur.last_name,cr.horaire,cr.salle,cr.matière,unecolle.id])
                     else:
-                        dico_semaine[cr.jour].append(["non attribué",cr.colleur.first_name+" "+cr.colleur.last_name,cr.horaire,cr.salle,cr.matière])
+                        dico_semaine[cr.jour].append(["non attribué",cr.colleur.first_name+" "+cr.colleur.last_name,cr.horaire,cr.salle,cr.matière,unecolle.id])
                 else:
                     if unecolle.eleve!=None:
-                        dico_semaine["autre_jour"].append([unecolle.eleve.first_name+" "+unecolle.eleve.last_name,cr.colleur.first_name+" "+cr.colleur.last_name,cr.horaire,cr.salle,cr.matière,cr.jour])
+                        dico_semaine["autre_jour"].append([unecolle.eleve.first_name+" "+unecolle.eleve.last_name,cr.colleur.first_name+" "+cr.colleur.last_name,cr.horaire,cr.salle,cr.matière,cr.jour,unecolle.id])
                     else:
-                        dico_semaine["autre_jour"].append(["non attribué",cr.colleur.first_name+" "+cr.colleur.last_name,cr.horaire,cr.salle,cr.matière,cr.jour])
+                        dico_semaine["autre_jour"].append(["non attribué",cr.colleur.first_name+" "+cr.colleur.last_name,cr.horaire,cr.salle,cr.matière,cr.jour,unecolle.id])
             for key in dico_semaine:
                 dico_semaine[key].sort(key=lambda x:x[1])
             response_data["informations"]=dico_semaine
@@ -973,4 +977,26 @@ def recupere_commentaire_notes_colles(request):
     except:
         response_data["texte"]=""
         debug("erreur dans recupere_commentaire_notes_colles ou bien commentaire vide")
+    return HttpResponse(json.dumps(response_data), content_type="application/json") 
+
+@auth(None)
+def modifie_creneau(request):
+    response_data = {}
+    try:
+        lacolle=Colloscope.objects.get(id=request.POST["id"])
+        oldcreneau=lacolle.creneau
+        if est_gestionnaire_colle(request.user):
+            try:
+                newcreneau=CreneauxColleurs.objects.get(colleur=oldcreneau.colleur,jour=request.POST["jour"],horaire=request.POST["horaire"],
+                                            salle=request.POST["salle"],matière=oldcreneau.matière)
+            except:
+                newcreneau=CreneauxColleurs.objects.create(colleur=oldcreneau.colleur,jour=request.POST["jour"],horaire=request.POST["horaire"],
+                                            salle=request.POST["salle"],matière=oldcreneau.matière,numero=0)
+                newcreneau.save()
+            lacolle.creneau=newcreneau
+            lacolle.save()
+        else:
+            debug("tentative de piratage modifie_creneau")
+    except:
+        debug("erreur dans modifie_creneau")
     return HttpResponse(json.dumps(response_data), content_type="application/json") 

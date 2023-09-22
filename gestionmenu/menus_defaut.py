@@ -38,6 +38,8 @@ def liste_fichiers(request,id_menu,context):
         context['fichier']=Fichier.objects.filter(menu=le_menu)
     else:
         context['fichier']=Fichier.objects.filter(menu=le_menu).exclude(date_parution__gt=datetime.datetime.now())
+    for k in context['fichier']:
+        k.description=k.description.split("\r\n")
     # on détermine si l'utilisateur est un gestionnaire de cette page
     context['gestionnaire']=gestionnaire
     return render(request,'gestionmenu/listefichiers.html',context)
@@ -114,7 +116,7 @@ def fichier_unique(request,id_menu,context):
         return render(request,'gestionmenu/fichier_unique.html',context)
     
 def initialisation(request,id_menu,context):
-    if True: #try: 
+    try: 
         if request.method=='POST':
             action=request.POST['action']
             if action in liste_initialisation:
@@ -124,7 +126,7 @@ def initialisation(request,id_menu,context):
                 debug("erreur nom fonction initialisation")
         context["lesactions"]=liste_initialisation
         return render(request,'gestionmenu/initialisation.html',context)
-    #except:
+    except:
         debug("erreur dans la fonction initialisation")
         return redirect('/home')
 

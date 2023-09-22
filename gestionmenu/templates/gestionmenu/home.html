@@ -3,6 +3,15 @@
 {% block body %}
 <BR>
  <DIV class=cadreinfo style="text-align:center;">
+    <DIV class="textedinfo">
+        <form method="POST" action="">
+            {% csrf_token %}
+            <div> Informations pour la semaine numéro <select id="informations" onchange="maj_informations()">
+                {% for unesemaine in lessemaines %} <option value="{{ unesemaine.numero }}">{{ unesemaine.numero }} commençant le {{ unesemaine.date }}</option>{% endfor %}
+            </select></div>
+            <div id="indic_semaine"></div>
+        </form>
+    </DIV>    
     {% if prof %}
     <form method="POST" style="text-align: center;" action="">
         {% csrf_token %}
@@ -13,19 +22,10 @@
         </DIV>
     {% elif eleve %} 
     <DIV class="textedinfo">
-        <form method="POST" action="">
-            {% csrf_token %}
-            <div> Informations pour la semaine numéro <select id="informations" onchange="maj_informations()">
-                {% for unesemaine in lessemaines %} <option value="{{ unesemaine.numero }}">{{ unesemaine.numero }} commençant le {{ unesemaine.date }}</option>{% endfor %}
-            </select></div>
-            <div id="indic_semaine"></div>
-        </form>
-    </DIV>
-    <DIV class="textedinfo">
         <textarea name="index" rows="15" cols="80" disabled>{{ annonce }}</textarea> <BR>
     </DIV>
     {% else %}
-    <DIV class="textedinfo">
+    <DIV class="textedinfo"><br><br>
     Bonjour !
     </DIV>
     {% endif %}
