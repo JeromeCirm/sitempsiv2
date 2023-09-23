@@ -30,5 +30,5 @@ def recuperation_informations_home_perso(request):
             msg=informations_colle_semaine_colleur(request.user,lasemaine)
             response_data["informations"]=msg              
     except:
-        debug("erreur dans recuperation_informations_home")
+        debug("erreur dans recuperation_informations_home_perso")
     return HttpResponse(json.dumps(response_data), content_type="application/json")    
