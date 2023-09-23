@@ -22,9 +22,13 @@ def recuperation_informations_home_perso(request):
         lesgroupes=request.user.groups.all()
         if groupe_eleves in lesgroupes:
             lasemaine=Semaines.objects.get(numero=request.POST["semaine"])  
-            msg=informations_colle_semaine(request.user,lasemaine)
+            msg=informations_colle_semaine_eleve(request.user,lasemaine)
             msg=['Voici les informations de la semaine : ']+msg
             response_data["informations"]=msg
+        elif est_colleur(request.user):
+            lasemaine=Semaines.objects.get(numero=request.POST["semaine"])  
+            msg=informations_colle_semaine_colleur(request.user,lasemaine)
+            response_data["informations"]=msg              
     except:
         debug("erreur dans recuperation_informations_home")
     return HttpResponse(json.dumps(response_data), content_type="application/json")    
