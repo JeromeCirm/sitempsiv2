@@ -7,7 +7,7 @@
         <form method="POST" action="">
             {% csrf_token %}
             <div> Informations pour la semaine numéro <select id="informations" onchange="maj_informations()">
-                {% for unesemaine in lessemaines %} <option value="{{ unesemaine.numero }}">{{ unesemaine.numero }} commençant le {{ unesemaine.date }}</option>{% endfor %}
+                {% for unesemaine in lessemaines %} <option value="{{ unesemaine.numero }}" {% if lasemaine == unesemaine.numero %} selected {% endif %}>{{ unesemaine.numero }} commençant le {{ unesemaine.date }}</option>{% endfor %}
             </select></div>
             <div id="indic_semaine"></div>
         </form>

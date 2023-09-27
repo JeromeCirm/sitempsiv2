@@ -53,6 +53,10 @@ def home(request):
         context["titresite"]=TITRE_SITE
         lessemaines=Semaines.objects.all().order_by("numero")
         context["lessemaines"]=[{"numero":x.numero,"date":date_fr(x.date,True)} for x in lessemaines]
+        try:
+            context["lasemaine"]=semaine_en_cours().numero
+        except:
+            context["lasemaine"]=0
         lesgroupes=request.user.groups.all()
         if groupe_eleves in lesgroupes:
             context["eleve"]=True
