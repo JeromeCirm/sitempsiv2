@@ -426,6 +426,10 @@ def colloscope_semaine(request,id_menu,context):
         if est_prof(request.user) or est_colleur(request.user) or est_eleve(request.user) or est_generic(request.user):
             lessemaines=Semaines.objects.all().order_by("numero")
             context["lessemaines"]=[{"numero":x.numero,"date":date_fr(x.date,True)} for x in lessemaines]
+            try:
+                context["lasemaine"]=semaine_en_cours().numero
+            except:
+                context["lasemaine"]=0            
             if not est_generic(request.user):
                 context["les_groupes"]=GroupeColles.objects.all()
             return render(request,'gestionmenu/colloscope_semaine.html',context)

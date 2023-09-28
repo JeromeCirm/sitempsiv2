@@ -7,7 +7,7 @@
 <form method="POST" action="">
     {% csrf_token %}
 <div> Informations pour la semaine numéro <select id="informations" onchange="maj_informations()">
-    {% for unesemaine in lessemaines %} <option value="{{ unesemaine.numero }}">{{ unesemaine.numero }} commençant le {{ unesemaine.date }}</option>{% endfor %}
+    {% for unesemaine in lessemaines %} <option value="{{ unesemaine.numero }}" {% if lasemaine == unesemaine.numero %} selected {% endif %}>{{ unesemaine.numero }} commençant le {{ unesemaine.date }}</option>{% endfor %}
 </select></div><div style="padding : 10px;display:inline-block;text-align:left" id="indic_semaine"> </div>
 </form>
 {% if les_groupes %}
@@ -92,6 +92,7 @@
                 informations[key].forEach(function (u) {
                     let com=document.createElement('button')
                     com.setAttribute('type','button')
+                    com.setAttribute('class','inputmobilemarc25')
                     com.innerHTML='M'
                     com.setAttribute('style','color:black;background-color:lightgray')
                     com.setAttribute('onclick','modif_creneau('+u[5]+',\''+u[0]+" "+key+" avec "+u[1]+" à "+u[2]+" en "+u[3]+" ("+u[4]+")"+'\',"'
@@ -130,6 +131,7 @@
                 informations["autre_jour"].forEach(function (u) {
                     let com=document.createElement('button')
                     com.setAttribute('type','button')
+                    com.setAttribute('class','inputmobilemarc25')
                     com.innerHTML='M'
                     com.setAttribute('style','color:black;background-color:lightgray')
                     com.setAttribute('onclick','modif_creneau('+u[6]+',\''+u[0]+" "+u[5]+" avec "+u[1]+" à "+u[2]+" en "+u[3]+" ("+u[4]+")"+'\',"'
