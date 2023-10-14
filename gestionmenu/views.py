@@ -1013,7 +1013,7 @@ def recuperation_notes_colles_semaine(request):
         contenu=[]
         for item in lesnotes:
             d={"id":item.id,"semaine":item.semaine.numero,"note":item.note,"colleur":joli_nom(item.colleur)}
-            if item.colleur.username in ["rouillier","lenoir","korolitski"]:
+            if item.colleur.username in ["rouillier","lenoir"]:
                 try:
                     com=CommentaireColle.objects.get(notecolle=item)
                     d["commentaire"]=com.text
