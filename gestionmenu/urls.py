@@ -44,4 +44,5 @@ urlpatterns = urlpatterns_perso+[
     path('maj_commentaire_notes_colles',views.maj_commentaire_notes_colles,name='maj_commentaire_notes_colles'),
     path('recupere_commentaire_notes_colles',views.recupere_commentaire_notes_colles,name='recupere_commentaire_notes_colles'),
     path('modifie_creneau',views.modifie_creneau,name='modifie_creneau'),
+    path('recuperation_notes_colles_semaine',views.recuperation_notes_colles_semaine,name='recuperation_notes_colles_semaine'),
     ]

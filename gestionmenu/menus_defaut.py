@@ -164,8 +164,6 @@ def rentrer_notes_colles(request,id_menu,context):
     return render(request,'gestionmenu/rentrer_notes_colles.html',context)
 
 def lire_notes_colles(request,id_menu,context):
-    lesnotes=NotesColles.objects.filter(eleve=request.user).order_by("-semaine")
-    context["contenu"]=[{"semaine":item.semaine,"note":item.note,"colleur":joli_nom(item.colleur)} for item in lesnotes]
     return render(request,'gestionmenu/lire_notes_colles.html',context)
 
 def lire_notes_colleurs(request,id_menu,context):
