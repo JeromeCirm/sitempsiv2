@@ -1007,3 +1007,23 @@ def modifie_creneau(request):
     except:
         debug("erreur dans modifie_creneau")
     return HttpResponse(json.dumps(response_data), content_type="application/json") 
+
+@auth(None)
+def recuperation_notes_colles_semaine(request):
+    response_data = {}
+    try:
+        lesnotes=NotesColles.objects.filter(eleve=request.user).order_by("-semaine")
+        contenu=[]
+        for item in lesnotes:
+            d={"id":item.id,"semaine":item.semaine.numero,"note":item.note,"colleur":joli_nom(item.colleur)}
+            if item.colleur.username in ["rouillier","lenoir"]:
+                try:
+                    com=CommentaireColle.objects.get(notecolle=item)
+                    d["commentaire"]=com.text
+                except:
+                    pass
+            contenu.append(d)
+        response_data["notes_semaine"]=contenu
+    except:
+        debug("erreur dans recuperation_notes_colles_semaine")
+    return HttpResponse(json.dumps(response_data), content_type="application/json") 

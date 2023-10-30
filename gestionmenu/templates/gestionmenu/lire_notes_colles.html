@@ -6,11 +6,63 @@
 
 <div style="text-align:center">
 <div id="lesnotes">
-    <ul>
+    <!-- <ul>
         {% for item in contenu %}
         <li>semaine {{ item.semaine }} : {% if item.note == -1 %} Absent(e) {% elif item.note == -2 %} Non noté(e)  {% else %} {{ item.note }} {% endif %} avec {{ item.colleur }}</li>
         {% endfor %}
-    </ul>
+    </ul> -->
 </div>
 </div>
+<form method="POST" action="">
+    {% csrf_token %}
+</form>
+
+<script>
+var lescom=new Map();
+let lesnotes=document.getElementById("lesnotes")
+
+function affiche_notes() {
+    var formData = new FormData();
+    csrf=document.getElementsByName('csrfmiddlewaretoken')[0] 
+    formData.append('csrfmiddlewaretoken',csrf.value)
+    fetch("/recuperation_notes_colles_semaine", {
+        method : 'POST',
+        headers : {
+            'Accept': 'application/json, text/plain, */*',
+        },
+        body: formData
+    }).then(function(res){ return res.json();}).then(function(res){
+        res["notes_semaine"].forEach(element => {
+            let label2=document.createElement('input')
+            label2.setAttribute('class','inputmobilemarc2')
+            if (element.note == -1) {
+                label2.value='A'
+            } else if (element.note == -2) {
+                label2.value='N'            
+            } else {
+                label2.value=element.note
+            }
+            lesnotes.appendChild(label2)            
+            let com=document.createElement('button')
+            com.setAttribute('type','button')
+            com.innerHTML='C'
+            if ( "commentaire" in element  ) {
+                com.setAttribute('style','color:black;background-color:lightgray')
+                com.setAttribute('onclick','bootbox.alert(lescom.get('+element.id+'))')
+                lescom.set(element.id,element.commentaire)
+            } else {
+                com.setAttribute('style','color:lightgray;background-color:lightgray')
+            }    
+            lesnotes.appendChild(com)
+            let label3=document.createElement('input')
+            label3.setAttribute('class','inputmobilemarc3')
+            label3.value=" avec "+element.colleur+" en semaine "+element.semaine
+            lesnotes.appendChild(label3)     
+            lesnotes.appendChild(document.createElement('br'))
+        });
+    }).catch(function(err){ console.log('Erreur requête', err);});
+}
+
+    affiche_notes()
+</script>
 {% endblock body %}
