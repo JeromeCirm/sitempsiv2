@@ -667,26 +667,28 @@ def recuperation_colloscope_semaine(request):
             lescolles=Colloscope.objects.filter(semaine=lasemaine)
             for unecolle in lescolles:
                 cr=unecolle.creneau
+                autorise_modif=est_gestionnaire_colle(request.user,cr.colleur) or (est_colleur(request.user) and request.user==cr.colleur)
                 if cr.jour in dico_semaine:
-                    dico_semaine[cr.jour].append(["Groupe "+str(unecolle.groupe.numero),cr.colleur.first_name+" "+cr.colleur.last_name,cr.horaire,cr.salle,cr.matière,unecolle.id])
+                    dico_semaine[cr.jour].append(["Groupe "+str(unecolle.groupe.numero),cr.colleur.first_name+" "+cr.colleur.last_name,cr.horaire,cr.salle,cr.matière,unecolle.id,autorise_modif])
                 else:
-                    autre_jour.append(["Groupe "+str(unecolle.groupe.numero),cr.colleur.first_name+" "+cr.colleur.last_name,cr.horaire,cr.salle,cr.matière,cr.jour,unecolle.id])
+                    autre_jour.append(["Groupe "+str(unecolle.groupe.numero),cr.colleur.first_name+" "+cr.colleur.last_name,cr.horaire,cr.salle,cr.matière,cr.jour,unecolle.id,autorise_modif])
             dico_semaine["autre_jour"]=autre_jour
             lesindividuelles=Colloscope_individuel.objects.filter(semaine=lasemaine)
             for unecolle in lesindividuelles:
                 cr=unecolle.creneau
+                autorise_modif=est_gestionnaire_colle(request.user,cr.colleur) or (est_colleur(request.user) and request.user==cr.colleur)
                 if cr.jour in dico_semaine:
                     if unecolle.eleve!=None:
-                        dico_semaine[cr.jour].append([unecolle.eleve.first_name+" "+unecolle.eleve.last_name,cr.colleur.first_name+" "+cr.colleur.last_name,cr.horaire,cr.salle,cr.matière,unecolle.id])
+                        dico_semaine[cr.jour].append([unecolle.eleve.first_name+" "+unecolle.eleve.last_name,cr.colleur.first_name+" "+cr.colleur.last_name,cr.horaire,cr.salle,cr.matière,unecolle.id,autorise_modif])
                     else:
-                        dico_semaine[cr.jour].append(["non attribué",cr.colleur.first_name+" "+cr.colleur.last_name,cr.horaire,cr.salle,cr.matière,unecolle.id])
+                        dico_semaine[cr.jour].append(["non attribué",cr.colleur.first_name+" "+cr.colleur.last_name,cr.horaire,cr.salle,cr.matière,unecolle.id,autorise_modif])
                 else:
                     if unecolle.eleve!=None:
-                        dico_semaine["autre_jour"].append([unecolle.eleve.first_name+" "+unecolle.eleve.last_name,cr.colleur.first_name+" "+cr.colleur.last_name,cr.horaire,cr.salle,cr.matière,cr.jour,unecolle.id])
+                        dico_semaine["autre_jour"].append([unecolle.eleve.first_name+" "+unecolle.eleve.last_name,cr.colleur.first_name+" "+cr.colleur.last_name,cr.horaire,cr.salle,cr.matière,cr.jour,unecolle.id,autorise_modif])
                     else:
-                        dico_semaine["autre_jour"].append(["non attribué",cr.colleur.first_name+" "+cr.colleur.last_name,cr.horaire,cr.salle,cr.matière,cr.jour,unecolle.id])
+                        dico_semaine["autre_jour"].append(["non attribué",cr.colleur.first_name+" "+cr.colleur.last_name,cr.horaire,cr.salle,cr.matière,cr.jour,unecolle.id,autorise_modif])
             for key in dico_semaine:
-                dico_semaine[key].sort(key=lambda x:x[1])
+                dico_semaine[key].sort(key=lambda x:x[1]) 
             response_data["informations"]=dico_semaine
         else:
             debug("tentative de piratage recuperation_colloscope_semaine")
@@ -989,7 +991,8 @@ def modifie_creneau(request):
     try:
         lacolle=Colloscope.objects.get(id=request.POST["id"])
         oldcreneau=lacolle.creneau
-        if est_gestionnaire_colle(request.user):
+        autorise_modif=est_gestionnaire_colle(request.user,oldcreneau.colleur) or (est_colleur(request.user) and request.user==oldcreneau.colleur)
+        if autorise_modif:
             try:
                 newcreneau=CreneauxColleurs.objects.get(colleur=oldcreneau.colleur,jour=request.POST["jour"],horaire=request.POST["horaire"],
                                             salle=request.POST["salle"],matière=oldcreneau.matière)

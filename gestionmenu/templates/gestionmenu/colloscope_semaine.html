@@ -94,9 +94,13 @@
                     com.setAttribute('type','button')
                     com.setAttribute('class','inputmobilemarc25')
                     com.innerHTML='M'
-                    com.setAttribute('style','color:black;background-color:lightgray')
-                    com.setAttribute('onclick','modif_creneau('+u[5]+',\''+u[0]+" "+key+" avec "+u[1]+" à "+u[2]+" en "+u[3]+" ("+u[4]+")"+'\',"'
+                    if (u[6]) {
+                        com.setAttribute('style','color:black;background-color:lightgray')
+                        com.setAttribute('onclick','modif_creneau('+u[5]+',\''+u[0]+" "+key+" avec "+u[1]+" à "+u[2]+" en "+u[3]+" ("+u[4]+")"+'\',"'
                            +key+'","'+u[2]+'","'+u[3]+'")')
+                    } else {
+                      com.setAttribute('style','color:lightgray;background-color:lightgray')
+                    }
                     indic_semaine.appendChild(com)                    
                     var item=document.createElement('input')
                     item.value=u[0]+" avec "+u[1]+" à "+u[2]+" en "+u[3]+" ("+u[4]+")"
@@ -133,9 +137,13 @@
                     com.setAttribute('type','button')
                     com.setAttribute('class','inputmobilemarc25')
                     com.innerHTML='M'
-                    com.setAttribute('style','color:black;background-color:lightgray')
-                    com.setAttribute('onclick','modif_creneau('+u[6]+',\''+u[0]+" "+u[5]+" avec "+u[1]+" à "+u[2]+" en "+u[3]+" ("+u[4]+")"+'\',"'
+                    if (u[7]) {
+                        com.setAttribute('style','color:black;background-color:lightgray')
+                        com.setAttribute('onclick','modif_creneau('+u[6]+',\''+u[0]+" "+u[5]+" avec "+u[1]+" à "+u[2]+" en "+u[3]+" ("+u[4]+")"+'\',"'
                            +u[5]+'","'+u[2]+'","'+u[3]+'")')
+                    } else {
+                      com.setAttribute('style','color:lightgray;background-color:lightgray')
+                    }
                     indic_semaine.appendChild(com)                    
                     var item=document.createElement('input')
                     item.value=u[0]+" avec "+u[1]+" à "+u[2]+" en "+u[3]+" ("+u[4]+" "+u[5]+")"
@@ -160,7 +168,7 @@
                 indic_semaine.appendChild(document.createElement("br"))
             }
     }
-    
+
 var modal_id= document.getElementById("modal_id")
 var modal_jour= document.getElementById("modal_jour")
 var modal_salle= document.getElementById("modal_salle")
