@@ -207,3 +207,22 @@ class CommentaireColle(models.Model):
        return 'private_files/commentairescolles/'+str(self.id)+extension(self.nomfichier)
    fichier=models.FileField(null=True,blank=True,upload_to=uploadpath)
    nomfichier=models.CharField(max_length=100,null=True,blank=True)
+
+class Sondages(models.Model):
+    createur=models.ForeignKey(User,on_delete=models.CASCADE)
+    titre=models.TextField(null=True,blank=True)
+    description=models.TextField(null=True,blank=True)
+    type_sondage=models.TextField(null=True,blank=True)
+    actif=models.BooleanField(null=True,blank=True)
+    visible=models.BooleanField(null=True,blank=True)
+    date=models.DateField(blank=True,null=True)
+
+class SondagesItem(models.Model):
+    sondage=models.ForeignKey(Sondages,on_delete=models.CASCADE)
+    texte=models.TextField(null=True,blank=True)
+    numero=models.IntegerField(null=True,blank=True)
+
+class SondagesReponse(models.Model):
+    utilisateur=models.ForeignKey(User,on_delete=models.CASCADE)
+    reponse=models.TextField(null=True,blank=True)
+    sondage=models.ForeignKey(Sondages,on_delete=models.CASCADE)
