@@ -15,6 +15,7 @@ from wsgiref.util import FileWrapper
 from django.http.response import HttpResponse
 from django.http import FileResponse
 import json
+from collections import defaultdict
 from .fonctions import *
 from .menus_defaut import *
 try:
@@ -1027,3 +1028,111 @@ def recuperation_notes_colles_semaine(request):
     except:
         debug("erreur dans recuperation_notes_colles_semaine")
     return HttpResponse(json.dumps(response_data), content_type="application/json") 
+
+@auth(None)
+def creation_sondage(request):
+    response_data = {}
+    try:
+        if not est_prof(request.user):
+            debug("tentative de piratage creation_sondage")
+            return
+        titre=request.POST['titre']
+        texte=request.POST['texte']
+        type_sondage=request.POST['type_sondage']
+        if type_sondage not in ["question","choix","priorise"]:
+            debug("tentative de piratage creation_sondage")
+            return
+        newsondage=Sondages(titre=titre,description=texte,type_sondage=type_sondage,actif=True,visible=True,createur=request.user)
+        newsondage.save()
+        if type_sondage!="question":
+            complement=int(request.POST['complement'])
+            complement_tab=[request.POST['complement'+str(i)] for i in range(complement)]        
+            for i,x in enumerate(complement_tab):
+                newitem=SondagesItem(sondage=newsondage,texte=x,numero=i)
+                newitem.save()
+    except:
+        debug("erreur dans creation_sondage")
+    return HttpResponse(json.dumps(response_data), content_type="application/json")     
+
+@auth(None)
+def sondage(request):
+    response_data = {}
+    try:
+        if not est_eleve(request.user):
+            debug("tentative de piratage sondage")
+            return
+        action=request.POST['action']
+        if action=="demande":
+            lessondages=Sondages.objects.filter(actif=True)
+            for lesondage in lessondages:
+                d={}
+                try:
+                    reponse=SondagesReponse.objects.get(utilisateur=request.user,sondage=lesondage)
+                    d["reponse"]=reponse.reponse
+                except:
+                    newreponse=SondagesReponse(utilisateur=request.user,sondage=lesondage,reponse="")
+                    newreponse.save()
+                    d["reponse"]=""
+                d["titre"]=lesondage.titre
+                d["description"]=lesondage.description
+                d["type_sondage"]=lesondage.type_sondage
+                if lesondage.type_sondage!="question":
+                    l=[]
+                    lesitems=SondagesItem.objects.filter(sondage=lesondage)
+                    for x in lesitems:
+                        l.append((x.numero,x.texte))
+                    d["lesitems"]=l
+                response_data[str(lesondage.id)]=d
+        elif action=="changement":
+            try:
+                sondage=Sondages.objects.get(id=request.POST["id_sondage"])
+                reponse=SondagesReponse.objects.get(utilisateur=request.user,sondage=sondage)
+                reponse.reponse=request.POST["reponse"]
+                reponse.save()
+            except:
+                debug("tentative de piratage sondage")
+                return
+    except:
+        debug("erreur dans sondage")
+    return HttpResponse(json.dumps(response_data), content_type="application/json")   
+
+@auth(None)
+def resultat_sondage(request):
+    response_data = {}
+    try:
+        if not est_prof(request.user):
+            debug("tentative de piratage resultat_sondage")
+            return
+        lessondages=Sondages.objects.filter(actif=True)
+        for lesondage in lessondages:
+            d={"type_sondage" : lesondage.type_sondage,"titre" : lesondage.titre}
+            if lesondage.type_sondage!="question":
+                l={}
+                lesitems=SondagesItem.objects.filter(sondage=lesondage)
+                for x in lesitems:
+                    l[str(x.numero)]=[x.texte]
+                d["lesitems"]=l
+            if lesondage.type_sondage=="choix":
+                lesreponses=SondagesReponse.objects.filter(sondage=lesondage)
+                choix_eleves=defaultdict(list)
+                nombre_eleves=defaultdict(int)
+                eleves_vu=set()
+                for unereponse in lesreponses:
+                    choix_eleves[unereponse.reponse].append(unereponse.utilisateur.username)
+                    eleves_vu.add(unereponse.utilisateur.username)
+                tousleseleves=User.objects.filter(groups=groupe_eleves).order_by('username')
+                for uneleve in tousleseleves:
+                    if uneleve.username not in eleves_vu:
+                        choix_eleves[""].append(uneleve.username)
+                for key in d["lesitems"]:
+                    if key not in choix_eleves:
+                        choix_eleves[key]=[]
+                for key in choix_eleves:
+                    choix_eleves[key].sort()
+                    nombre_eleves[key]=len(choix_eleves[key])
+                d['choix']=choix_eleves
+                d['nombre']=nombre_eleves
+            response_data[lesondage.id]=d
+    except:
+        debug("erreur dans resultat_sondage")
+    return HttpResponse(json.dumps(response_data), content_type="application/json")   

@@ -24,7 +24,7 @@ import datetime
 liste_menus_defaut = ['liste_fichiers','parametres_compte','gestion_menu','fichier_unique','initialisation','contacts',
                       'programme_colle','rentrer_notes_colles',
                       'lire_notes_colles','lire_notes_colleurs','lire_fiches_eleves','fiche_renseignements',
-                      'creation_fichier_pronote','colloscope','colloscope_semaine','gestion_colles']
+                      'creation_fichier_pronote','colloscope','colloscope_semaine','gestion_colles','gestion_sondages','sondages','resultat_sondages']
 
 def liste_fichiers(request,id_menu,context):
     le_menu=Menu.objects.get(id=id_menu)
@@ -469,4 +469,12 @@ def gestion_colles_individuelles(request,id_menu,context):
     context["modif_par_eleves"]=lamatiere.modif_par_eleves
     return render(request,'gestionmenu/gestion_colles_individuelles.html',context)
 
+def gestion_sondages(request,id_menu,context): 
+    return render(request,'gestionmenu/gestion_sondages.html',context)
+
+def sondages(request,id_menu,context): 
+    return render(request,'gestionmenu/sondages.html',context)
+
+def resultat_sondages(request,id_menu,context): 
+    return render(request,'gestionmenu/resultat_sondages.html',context)
 

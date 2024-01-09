@@ -49,6 +49,18 @@ class Gestion_colles_individuellesAdmin(admin.ModelAdmin):
 class CommentaireColleAdmin(admin.ModelAdmin):
     pass
 
+class SondagesAdmin(admin.ModelAdmin):
+    pass
+
+class SondagesItemAdmin(admin.ModelAdmin):
+    pass
+
+class SondagesReponseAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(Sondages,SondagesAdmin)
+admin.site.register(SondagesItem,SondagesItemAdmin)
+admin.site.register(SondagesReponse,SondagesReponseAdmin)
 admin.site.register(NotesColles,NotesCollesAdmin)
 admin.site.register(Divers,DiversAdmin)
 admin.site.register(Menu,MenuAdmin)

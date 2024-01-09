@@ -1,0 +1,111 @@
+{% extends 'gestionmenu/base.html' %}
+
+{% block body %}
+<h1> Gestion des sondages </h1>
+<hr>
+
+<div style="text-align:center"> 
+    Creation d'un nouveau sondage : <br><br>
+    <p>    
+        <label for="titre"> Titre du sondage : </label>
+        <input type="text" id="titre" name="titre" value="">
+    </p>
+    <p>    
+        <label for="texte"> Texte du sondage : </label>
+        <input type="text" id="texte" name="texte" value="">
+    </p>    
+    <label> Type de sondage : </label> 
+    <select id="type_sondage" name="type_sondage" type="select" onchange="change_type()">
+        <option value="question" > Question posée </option> 
+        <option value="choix" > Choix dans une liste </option> 
+        <option value="priorise" > Prioriser des options </option> 
+    </select> 
+    <div id="complement">
+
+    </div><br>
+    <button onclick="creation_sondage()" action=""> Création du sondage </button>
+</div>
+
+Liste des sondages existants : 
+<div id="existant">
+
+</div>
+<form method="POST" action=""> 
+    {% csrf_token %}
+</form>
+
+<script>
+let titre=document.getElementById("titre")
+let texte=document.getElementById("texte")
+let type_sondage=document.getElementById("type_sondage")
+let complement=document.getElementById("complement")
+let existant=document.getElementById("existant")
+let old_type="question"
+let complement_tab=[]
+
+function change_type() {
+    if (old_type == "question") {
+        complement_tab=[]
+        complement.innerHTML=""
+        let para=document.createElement('p')
+        let label=document.createElement('label')
+        label.innerHTML="Texte de l'item à ajouter : "
+        label.setAttribute('for','newitem')
+        para.appendChild(label)
+        let input=document.createElement('input')
+        input.setAttribute('id','newitem')
+        input.setAttribute('name','newitem')
+        input.setAttribute('type','text')
+        para.appendChild(input)
+        let button=document.createElement('button')
+        button.innerHTML="+"
+        button.setAttribute('onclick','add_item()')
+        para.appendChild(button)
+        complement.appendChild(para)
+    }
+    old_type=type_sondage.value
+    if (old_type == "question") {
+        complement.innerHTML=""
+    } 
+}
+
+function add_item() {
+    let newitem=document.getElementById("newitem")
+    complement_tab.push(newitem.value)
+    console.log(complement_tab)
+    let para=document.createElement('div')
+    let label=document.createElement('label')
+    label.innerHTML="item"+complement_tab.length.toString()+" : "
+    para.appendChild(label)
+    let texte=document.createElement('label')
+    texte.innerHTML=newitem.value
+    para.appendChild(texte)
+    complement.appendChild(para)    
+}
+
+function creation_sondage() {
+    var formData = new FormData();
+    formData.append('titre',titre.value );
+    formData.append('texte',texte.value );
+    formData.append('type_sondage',type_sondage.value );
+    formData.append('complement', complement_tab.length);
+    for (let i=0; i<complement_tab.length;i++) {
+        formData.append('complement'+i.toString(),complement_tab[i])
+    }
+    csrf=document.getElementsByName('csrfmiddlewaretoken')[0]
+    formData.append('csrfmiddlewaretoken',csrf.value)
+    fetch("/creation_sondage", {
+      method : 'POST',
+      headers : {
+        'Accept': 'application/json, text/plain, */*',
+      },
+      body: formData
+    }).then(function(res){ return res.json();})
+      .then(function(res){
+        
+      })
+      .catch(function(err){ console.log('Erreur requête', err);});
+}
+</script>
+
+{% endblock body %}
