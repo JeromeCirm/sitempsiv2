@@ -35,41 +35,114 @@ function affiche_sondage(reponse) {
     for (id in reponse) {
         sondage=reponse[id]
         if (sondage["type_sondage"]=="choix") {
-            let unsondage=document.createElement('p')
-            let titre=document.createElement('label')
-            titre.innerHTML=sondage["titre"]
-            unsondage.appendChild(titre)
-            unsondage.appendChild(document.createElement('br'))
-            let description=document.createElement('label')
-            description.innerHTML=sondage["description"]
-            unsondage.appendChild(description)
-            let choix=document.createElement('select')
-            choix.setAttribute("onchange","change_choix("+id+")")
-            choix.setAttribute("id",id)
-            let sanschoix=document.createElement('option')
-            sanschoix.setAttribute("value","")
-            sanschoix.innerHTML=""
-            console.log(sondage["reponse"])
-            if (sondage["reponse"]=="") {
-                sanschoix.setAttribute("selected","selected")
-            }
-            choix.appendChild(sanschoix)            
-            for (x in sondage["lesitems"]) {
-                item=sondage["lesitems"][x]
-                let unitem=document.createElement('option')
-                unitem.setAttribute("value",item[0])
-                unitem.innerHTML=item[1]
-                if (sondage["reponse"]==String(item[0])) {
-                    console.log(sondage["reponse"],"*",item[0])
-                    unitem.setAttribute("selected","selected")
+              let unsondage=document.createElement('p')
+              let titre=document.createElement('label')
+              titre.innerHTML=sondage["titre"]
+              unsondage.appendChild(titre)
+              unsondage.appendChild(document.createElement('br'))
+              let description=document.createElement('span')
+              description.innerHTML=sondage["description"]
+              unsondage.appendChild(description)
+              if (sondage["actif"]==true) {
+                let choix=document.createElement('select')
+                choix.setAttribute("onchange","change_choix("+id+")")
+                choix.setAttribute("id",id)
+                let sanschoix=document.createElement('option')
+                sanschoix.setAttribute("value","")
+                sanschoix.innerHTML=""
+                if (sondage["reponse"]=="") {
+                    sanschoix.setAttribute("selected","selected")
                 }
-                choix.appendChild(unitem)
-            }
-            unsondage.appendChild(choix)
-            liste_sondages.appendChild(unsondage)
-        }
+                choix.appendChild(sanschoix)            
+                for (x in sondage["lesitems"]) {
+                    item=sondage["lesitems"][x]
+                    let unitem=document.createElement('option')
+                    unitem.setAttribute("value",item[0])
+                    unitem.innerHTML=item[1]
+                    if (sondage["reponse"]==String(item[0])) {
+                        unitem.setAttribute("selected","selected")
+                    }
+                    choix.appendChild(unitem)
+                }
+                unsondage.appendChild(choix)
+              } else {
+                let choix=document.createElement('button')
+                for (x in sondage["lesitems"]) {
+                    item=sondage["lesitems"][x]
+                    if (sondage["reponse"]==String(item[0])) {
+                        choix.innerHTML=" "+item[1]
+                    }
+                }
+                unsondage.appendChild(choix)
+              }
+              liste_sondages.appendChild(unsondage)
+          } else if (sondage["type_sondage"]=="question") {
+              let unsondage=document.createElement('p')
+              let titre=document.createElement('label')
+              titre.innerHTML=sondage["titre"]
+              unsondage.appendChild(titre)
+              unsondage.appendChild(document.createElement('br'))
+              let description=document.createElement('span')
+              description.innerHTML=sondage["description"]
+              unsondage.appendChild(description)
+              let button=document.createElement('button')
+              button.innerHTML="Modifier la réponse"
+              button.setAttribute("onclick",'modif_question('+String(sondage["id"])+')')
+              unsondage.appendChild(button)
+              liste_sondages.appendChild(unsondage)
+            } else if (sondage["type_sondage"]=="priorise") {
+            console.log("priorise")
+          }
+
     }
 }
+
+function modif_question(id) {
+    var formData = new FormData();
+    formData.append("action","demande_reponse")
+    formData.append("id",id)
+    csrf=document.getElementsByName('csrfmiddlewaretoken')[0]
+    formData.append('csrfmiddlewaretoken',csrf.value)
+    fetch("/sondage", {
+      method : 'POST',
+      headers : {
+        'Accept': 'application/json, text/plain, */*',
+      },
+      body: formData
+    }).then(function(res){ return res.json();})
+      .then(function(res){
+        modif_question_suite(id,res["titre"],res["reponse"])
+      })
+      .catch(function(err){ console.log('Erreur requête', err);});
+}
+
+function modif_question_suite(id,titre,reponse) {
+    bootbox.prompt({
+      title: 'Modifier la réponse pour le sondage : '+titre,
+      inputType: 'textarea',
+      value : reponse,
+      callback: function (new_texte) {
+        if (new_texte != null) {
+          var formData = new FormData();
+          formData.append('action', "changement");
+          formData.append('id_sondage', id);
+          formData.append('reponse', new_texte);
+          csrf=document.getElementsByName('csrfmiddlewaretoken')[0]
+          formData.append('csrfmiddlewaretoken',csrf.value)
+          fetch("/sondage", {
+            method : 'POST',
+            headers : {
+              'Accept': 'application/json, text/plain, */*',
+              },
+              body: formData
+          }).then(function(res){ return res.json();})
+            .then(function(res){
+              
+          }).catch(function(err){ console.log('Erreur requête', err);});
+        } 
+      }
+    })
+  }
 
 function change_choix(id) {
     let le_sondage=document.getElementById(id)

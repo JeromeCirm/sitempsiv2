@@ -32,10 +32,13 @@ def joli_nom(user):  # renvoie le login ou   prénom+nom si cela a été renseig
 
 def date_fr(date,annee=False):
     # transforme la date en francais, avec ou sans l'année
-    if annee: 
-        return date.strftime("%d/%m/%y")
-    else:
-        return date.strftime("%d/%m")
+    try:
+        if annee: 
+            return date.strftime("%d/%m/%y")
+        else:
+            return date.strftime("%d/%m")
+    except:
+        return "None"
 
 # échange deux éléments d'un requete liste selon le champ ordre
 def echange(liste,ordre1,ordre2): 

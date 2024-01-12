@@ -72,6 +72,7 @@ color: rgb(213, 229, 242); /* bleu clair */
 }
 
 /* partie pour téléphone mobile */
+/*
 @media only screen and (max-width: 1000px) {
   h1 {
     font-size: 16px;
@@ -91,6 +92,7 @@ color: rgb(213, 229, 242); /* bleu clair */
     margin:10px
   }
 }
+*/
 
 
 .container {
@@ -381,7 +383,9 @@ background:#CFFF6A;
   display : none;
 }
 
+/*
 @media screen and (min-width: 1000px){
+*/
 .pasmobile {
   display : inline;
 }
@@ -392,7 +396,9 @@ background:#CFFF6A;
   }
 */
  
+/*
 }
+*/
 
 .conteneur-contenu{
 margin: 10px 10px;
@@ -467,24 +473,24 @@ approche rudimentaire */
 }
 
 .inputmobilemarc3{
-  width: 380px;
+  width: 280px;
 }
 
 /* pour colloscope perso ou non */
 /* large */
 .inputmobilemarc4{
-  width: 1000px;
+  width: 850px;
 /*
 width: 80%;
 */
 }
 
 .inputmobilemarc4bis{
-  width: 1025px;
+  width: 825px;
 }
 
 .inputmobilemarc5{
-  width: 120px;
+  width: 100px;
 /*
 width: 20%;
 */
@@ -500,92 +506,14 @@ width: 20%;
   width: 150px;
 }
 .inputmobilemarc8long{
-  width: 1154px;
+  width: 954px;
 }
-.inputmobilemarc10{
-  width: 220px;
-}
+
 .divtableau{
   /* display: block; */
   display: inline-flex;
 }
 
-/* partie pour téléphone mobile */
-/* 740 -> 1000 */
-@media only screen and (max-width: 1000px) {
-
-.textedinfo{
-padding: 5px;
-}
-
-  .textedinfo textarea{
-    padding : 5px;
-    margin: 0px;
-    display:inline-block;
-    text-align:left;
-    max-width: 100%;
-    width: 100%;
-  }
-
-/* pour bilan notes */
-.inputmobilemarc1{
-  width: 160px;
-  font-size: 9pt;
-}
-
-.inputmobilemarc2{
-  width: 25px;
-  font-size: 9pt;
-}
-
-.inputmobilemarc25{
-  width: 20px;
-  font-size: 7pt;
-}
-
-.inputmobilemarc3{
-  width: 140px;
-  font-size: 9pt;
-}
-
-/* pour colloscope perso ou non */
-/* large */
-.inputmobilemarc4{
-  width: 230px;
-  font-size: 7pt;
-}
-.inputmobilemarc4bis{
-  width: 250px;
-  font-size: 7pt;
-}
-
-/* premier pas très large */
-.inputmobilemarc5{
-  width: 58px;
-  font-size: 7pt;
-}
-.inputmobilemarc6{
-  width: 75px;
-  font-size: 7pt;
-}
-.inputmobilemarc7{
-  width: 85px;
-  font-size: 7pt;
-}
-.inputmobilemarc8long{
-  width: 315px;
-  font-size: 7pt;
-}
-.inputmobilemarcfacultatif{
-  display: none;
-}
-.inputmobilemarc10{
-  width: 175px;
-}
-
-.divtableau{
-}
-}
 
 
 

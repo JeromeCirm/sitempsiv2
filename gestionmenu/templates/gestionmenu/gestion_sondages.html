@@ -7,7 +7,7 @@
 <div style="text-align:center"> 
     Creation d'un nouveau sondage : <br><br>
     <p>    
-        <label for="titre"> Titre du sondage : </label>
+        <label for="titre"> Titre du sondage (ne pas utiliser le symbole "): </label>
         <input type="text" id="titre" name="titre" value="">
     </p>
     <p>    
@@ -27,8 +27,7 @@
 </div>
 
 Liste des sondages existants : 
-<div id="existant">
-
+<div id="existant"> 
 </div>
 <form method="POST" action=""> 
     {% csrf_token %}
@@ -72,7 +71,6 @@ function change_type() {
 function add_item() {
     let newitem=document.getElementById("newitem")
     complement_tab.push(newitem.value)
-    console.log(complement_tab)
     let para=document.createElement('div')
     let label=document.createElement('label')
     label.innerHTML="item"+complement_tab.length.toString()+" : "
@@ -85,6 +83,7 @@ function add_item() {
 
 function creation_sondage() {
     var formData = new FormData();
+    formData.append('action','creation' );
     formData.append('titre',titre.value );
     formData.append('texte',texte.value );
     formData.append('type_sondage',type_sondage.value );
@@ -102,10 +101,90 @@ function creation_sondage() {
       body: formData
     }).then(function(res){ return res.json();})
       .then(function(res){
-        
+          affiche_sondage()
       })
       .catch(function(err){ console.log('Erreur requête', err);});
 }
+
+function affiche_sondage() {
+    var formData = new FormData();
+    formData.append('action','demande' );
+    csrf=document.getElementsByName('csrfmiddlewaretoken')[0]
+    formData.append('csrfmiddlewaretoken',csrf.value)
+    fetch("/creation_sondage", {
+      method : 'POST',
+      headers : {
+        'Accept': 'application/json, text/plain, */*',
+      },
+      body: formData
+    }).then(function(res){ return res.json();})
+      .then(function(res){
+        existant.innerHTML=""
+        let liste=document.createElement('ul')
+        for (i in res["les_sondages"]) {
+            unsondage=res["les_sondages"][i]
+            let item=document.createElement('li')
+            let texte=document.createElement('span')
+            texte.innerHTML=unsondage["titre"]+" créé le "+unsondage["date"]+", de type : "+unsondage["type_sondage"]+" "
+            item.appendChild(texte)
+            let visible=document.createElement('button')
+            if (unsondage["visible"]) {
+                visible.innerHTML="visible"
+            } else {
+                visible.innerHTML="non visible"
+            }
+            visible.setAttribute("onclick",'change_etat("visible",'+String(unsondage.id)+','+String(unsondage.visible)+')')
+            item.appendChild(visible)
+            let actif=document.createElement('button')
+            if (unsondage["actif"]) {
+                actif.innerHTML="actif"
+            } else {
+                actif.innerHTML="non actif"
+            }            
+            actif.setAttribute("onclick",'change_etat("actif",'+String(unsondage.id)+','+String(unsondage.actif)+')')
+            item.appendChild(actif)
+            let supprime=document.createElement('button')
+            supprime.innerHTML="suppression"
+            supprime.setAttribute("onclick",'verif_supprime('+String(unsondage.id)+',"'+String(unsondage["titre"])+'")')
+            item.appendChild(supprime)            
+            liste.appendChild(item)
+        }
+        existant.appendChild(liste)
+      })
+      .catch(function(err){ console.log('Erreur requête', err);});
+}
+
+function verif_supprime(id,titre) {
+    bootbox.confirm('Confirmation de la suppression du sondage : '+titre,
+    function(result) {
+        if (result==true) {
+            change_etat("supprime",id)
+        }
+    });
+}
+
+function change_etat(etat,id,valeur=0) {
+    var formData = new FormData();
+    formData.append('action','change' );
+    formData.append('id',id);
+    formData.append('etat', etat);
+    formData.append('valeur', valeur);
+    csrf=document.getElementsByName('csrfmiddlewaretoken')[0]
+    formData.append('csrfmiddlewaretoken',csrf.value)
+    fetch("/creation_sondage", {
+      method : 'POST',
+      headers : {
+        'Accept': 'application/json, text/plain, */*',
+      },
+      body: formData
+    }).then(function(res){ return res.json();})
+      .then(function(res){
+          affiche_sondage()
+      })
+      .catch(function(err){ console.log('Erreur requête', err);});    
+}
+
+affiche_sondage()
 </script>
 
 {% endblock body %}

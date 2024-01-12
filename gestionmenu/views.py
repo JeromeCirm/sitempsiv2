@@ -1036,20 +1036,53 @@ def creation_sondage(request):
         if not est_prof(request.user):
             debug("tentative de piratage creation_sondage")
             return
-        titre=request.POST['titre']
-        texte=request.POST['texte']
-        type_sondage=request.POST['type_sondage']
-        if type_sondage not in ["question","choix","priorise"]:
+        action=request.POST['action']
+        if action=="demande":
+            lessondages=Sondages.objects.filter(createur=request.user).order_by("-date")
+            liste=[]
+            for unsondage in lessondages:
+                liste.append({"titre": unsondage.titre, "date" : date_fr(unsondage.date,True), "type_sondage" : unsondage.type_sondage,
+                "actif" : unsondage.actif,"visible":unsondage.visible,"id":unsondage.id})
+                pass
+            response_data["les_sondages"]=liste
+        elif action=="creation":
+            titre=request.POST['titre']
+            texte=request.POST['texte']
+            type_sondage=request.POST['type_sondage']
+            if type_sondage not in ["question","choix","priorise"]:
+                debug("tentative de piratage creation_sondage")
+                return
+            newsondage=Sondages(titre=titre,description=texte,type_sondage=type_sondage,actif=True,visible=True,createur=request.user,date=datetime.datetime.now())
+            newsondage.save()
+            if type_sondage!="question":
+                complement=int(request.POST['complement'])
+                complement_tab=[request.POST['complement'+str(i)] for i in range(complement)]        
+                for i,x in enumerate(complement_tab):
+                    newitem=SondagesItem(sondage=newsondage,texte=x,numero=i)
+                    newitem.save()
+        elif action=="change":
+            id=request.POST['id']
+            lesondage=Sondages.objects.get(createur=request.user,id=id)
+            if request.POST["etat"]=="supprime":
+                lesondage.delete()
+            elif request.POST["etat"]=="visible":
+                if request.POST["valeur"]=="true":
+                    lesondage.visible=False
+                else:
+                    lesondage.visible=True
+                lesondage.save()
+            elif request.POST["etat"]=="actif":
+                if request.POST["valeur"]=="true":
+                    lesondage.actif=False
+                else:
+                    lesondage.actif=True
+                lesondage.save()
+            else:
+                debug("tentative de piratage creation_sondage")
+                return
+        else:
             debug("tentative de piratage creation_sondage")
             return
-        newsondage=Sondages(titre=titre,description=texte,type_sondage=type_sondage,actif=True,visible=True,createur=request.user)
-        newsondage.save()
-        if type_sondage!="question":
-            complement=int(request.POST['complement'])
-            complement_tab=[request.POST['complement'+str(i)] for i in range(complement)]        
-            for i,x in enumerate(complement_tab):
-                newitem=SondagesItem(sondage=newsondage,texte=x,numero=i)
-                newitem.save()
     except:
         debug("erreur dans creation_sondage")
     return HttpResponse(json.dumps(response_data), content_type="application/json")     
@@ -1057,13 +1090,13 @@ def creation_sondage(request):
 @auth(None)
 def sondage(request):
     response_data = {}
-    try:
+    if True: #try:
         if not est_eleve(request.user):
             debug("tentative de piratage sondage")
             return
         action=request.POST['action']
         if action=="demande":
-            lessondages=Sondages.objects.filter(actif=True)
+            lessondages=Sondages.objects.filter(visible=True)
             for lesondage in lessondages:
                 d={}
                 try:
@@ -1076,6 +1109,8 @@ def sondage(request):
                 d["titre"]=lesondage.titre
                 d["description"]=lesondage.description
                 d["type_sondage"]=lesondage.type_sondage
+                d["actif"]=lesondage.actif
+                d["id"]=lesondage.id
                 if lesondage.type_sondage!="question":
                     l=[]
                     lesitems=SondagesItem.objects.filter(sondage=lesondage)
@@ -1086,13 +1121,26 @@ def sondage(request):
         elif action=="changement":
             try:
                 sondage=Sondages.objects.get(id=request.POST["id_sondage"])
-                reponse=SondagesReponse.objects.get(utilisateur=request.user,sondage=sondage)
-                reponse.reponse=request.POST["reponse"]
-                reponse.save()
+                if sondage.actif and sondage.visible:
+                    reponse=SondagesReponse.objects.get(utilisateur=request.user,sondage=sondage)
+                    reponse.reponse=request.POST["reponse"]
+                    reponse.save()
             except:
                 debug("tentative de piratage sondage")
                 return
-    except:
+        elif action=="demande_reponse":
+            id=request.POST["id"]
+            lesondage=Sondages.objects.get(id=id)
+            response_data["titre"]=lesondage.titre
+            try:
+                lareponse=SondagesReponse.objects.get(utilisateur=request.user,sondage=lesondage)
+                response_data["reponse"]=lareponse.reponse
+            except:
+                response_data["reponse"]=""
+        else:
+            debug("tentative de piratage sondage")
+            return
+    #except:
         debug("erreur dans sondage")
     return HttpResponse(json.dumps(response_data), content_type="application/json")   
 
@@ -1103,36 +1151,59 @@ def resultat_sondage(request):
         if not est_prof(request.user):
             debug("tentative de piratage resultat_sondage")
             return
-        lessondages=Sondages.objects.filter(actif=True)
-        for lesondage in lessondages:
-            d={"type_sondage" : lesondage.type_sondage,"titre" : lesondage.titre}
-            if lesondage.type_sondage!="question":
-                l={}
-                lesitems=SondagesItem.objects.filter(sondage=lesondage)
-                for x in lesitems:
-                    l[str(x.numero)]=[x.texte]
-                d["lesitems"]=l
-            if lesondage.type_sondage=="choix":
-                lesreponses=SondagesReponse.objects.filter(sondage=lesondage)
-                choix_eleves=defaultdict(list)
-                nombre_eleves=defaultdict(int)
-                eleves_vu=set()
-                for unereponse in lesreponses:
-                    choix_eleves[unereponse.reponse].append(unereponse.utilisateur.username)
-                    eleves_vu.add(unereponse.utilisateur.username)
-                tousleseleves=User.objects.filter(groups=groupe_eleves).order_by('username')
-                for uneleve in tousleseleves:
-                    if uneleve.username not in eleves_vu:
-                        choix_eleves[""].append(uneleve.username)
-                for key in d["lesitems"]:
-                    if key not in choix_eleves:
-                        choix_eleves[key]=[]
-                for key in choix_eleves:
-                    choix_eleves[key].sort()
-                    nombre_eleves[key]=len(choix_eleves[key])
-                d['choix']=choix_eleves
-                d['nombre']=nombre_eleves
-            response_data[lesondage.id]=d
+        if request.POST["action"]=="demande":
+            lessondages=Sondages.objects.filter(actif=True)
+            for lesondage in lessondages:
+                d={"type_sondage" : lesondage.type_sondage,"titre" : lesondage.titre}
+                if lesondage.type_sondage!="question":
+                    l={}
+                    lesitems=SondagesItem.objects.filter(sondage=lesondage)
+                    for x in lesitems:
+                        l[str(x.numero)]=[x.texte]
+                    d["lesitems"]=l
+                if lesondage.type_sondage=="choix":
+                    lesreponses=SondagesReponse.objects.filter(sondage=lesondage)
+                    choix_eleves=defaultdict(list)
+                    nombre_eleves=defaultdict(int)
+                    eleves_vu=set()
+                    for unereponse in lesreponses:
+                        choix_eleves[unereponse.reponse].append(unereponse.utilisateur.username)
+                        eleves_vu.add(unereponse.utilisateur.username)
+                    tousleseleves=User.objects.filter(groups=groupe_eleves).order_by('username')
+                    for uneleve in tousleseleves:
+                        if uneleve.username not in eleves_vu:
+                            choix_eleves[""].append(uneleve.username)
+                    for key in d["lesitems"]:
+                        if key not in choix_eleves:
+                            choix_eleves[key]=[]
+                    for key in choix_eleves:
+                        choix_eleves[key].sort()
+                        nombre_eleves[key]=len(choix_eleves[key])
+                    d['choix']=choix_eleves
+                    d['nombre']=nombre_eleves
+                elif lesondage.type_sondage=="question":
+                    lesreponses=SondagesReponse.objects.filter(sondage=lesondage)
+                    avecreponse={}
+                    for unereponse in lesreponses:
+                        if unereponse.reponse!="":
+                            avecreponse[unereponse.utilisateur.username]=True
+                    sansreponse=[]
+                    tousleseleves=User.objects.filter(groups=groupe_eleves).order_by('username')
+                    for uneleve in tousleseleves:
+                        if uneleve.username not in avecreponse:
+                            sansreponse.append(uneleve.username)
+                    sansreponse.sort()
+                    avecreponse=sorted(avecreponse.keys())
+                    d["avecreponse"]=avecreponse
+                    d["nb_avecreponse"]=len(avecreponse)
+                    d["sansreponse"]=sansreponse
+                    d["nb_sansreponse"]=len(sansreponse)
+                response_data[lesondage.id]=d
+        elif request.POST["action"]=="demande":
+            pass
+        else:
+            debug("tentative de piratage resultat_sondage")
+            return
     except:
         debug("erreur dans resultat_sondage")
     return HttpResponse(json.dumps(response_data), content_type="application/json")   

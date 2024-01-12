@@ -15,6 +15,7 @@
     
     function recupere_sondage() {
         var formData = new FormData();
+        formData.append('action','demande')
         csrf=document.getElementsByName('csrfmiddlewaretoken')[0]
         formData.append('csrfmiddlewaretoken',csrf.value)
         fetch("/resultat_sondage", {
@@ -59,32 +60,40 @@
                     unsondage.appendChild(document.createElement('br'))
                 }
                 liste_sondages.appendChild(unsondage)
-            }
+            } else if (sondage["type_sondage"]=="question") {
+                let unsondage=document.createElement('p')
+                let titre=document.createElement('label')
+                titre.innerHTML=sondage["titre"]
+                unsondage.appendChild(titre)
+                unsondage.appendChild(document.createElement('br'))              
+                let chaine="Sans réponse ("+String(sondage["nb_sansreponse"])+") : "
+                for (y in sondage["sansreponse"]) {
+                    chaine=chaine+sondage["sansreponse"][y]+", "
+                }
+                let sansreponse=document.createElement('label')
+                sansreponse.innerHTML=chaine
+                unsondage.appendChild(sansreponse)                
+                let chainebis="Avec réponse ("+String(sondage["nb_avecreponse"])+") : "
+                for (y in sondage["avecreponse"]) {
+                  chainebis=chainebis+sondage["avecreponse"][y]+", "
+                }
+                let avecreponse=document.createElement('label')
+                avecreponse.innerHTML=chainebis
+                unsondage.appendChild(avecreponse)    
+                unsondage.appendChild(document.createElement('br'))
+                let button=document.createElement('button')
+                button.innerHTML="Lire les réponses"
+                button.setAttribute('onclick','lire_reponse()')   
+                unsondage.appendChild(button)        
+                liste_sondages.appendChild(unsondage)
+              }
         }
     }
     
-    function change_choix(id) {
-        let le_sondage=document.getElementById(id)
-        var formData = new FormData();
-        formData.append("action","changement")
-        formData.append("id_sondage",id)
-        formData.append("reponse",le_sondage.value)
-        csrf=document.getElementsByName('csrfmiddlewaretoken')[0]
-        formData.append('csrfmiddlewaretoken',csrf.value)
-        fetch("/sondage", {
-          method : 'POST',
-          headers : {
-            'Accept': 'application/json, text/plain, */*',
-          },
-          body: formData
-        }).then(function(res){ return res.json();})
-          .then(function(res){
-            
-          })
-          .catch(function(err){ console.log('Erreur requête', err);});
-    
+    function lire_reponse() {
+      console.log("lire les réponses")
     }
-    
+
     recupere_sondage()
     </script>
 
