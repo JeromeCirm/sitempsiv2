@@ -1090,7 +1090,7 @@ def creation_sondage(request):
 @auth(None)
 def sondage(request):
     response_data = {}
-    if True: #try:
+    try:
         if not est_eleve(request.user):
             debug("tentative de piratage sondage")
             return
@@ -1140,7 +1140,7 @@ def sondage(request):
         else:
             debug("tentative de piratage sondage")
             return
-    #except:
+    except:
         debug("erreur dans sondage")
     return HttpResponse(json.dumps(response_data), content_type="application/json")   
 
@@ -1152,7 +1152,7 @@ def resultat_sondage(request):
             debug("tentative de piratage resultat_sondage")
             return
         if request.POST["action"]=="demande":
-            lessondages=Sondages.objects.filter(actif=True)
+            lessondages=Sondages.objects.filter(visible=True)
             for lesondage in lessondages:
                 d={"type_sondage" : lesondage.type_sondage,"titre" : lesondage.titre}
                 if lesondage.type_sondage!="question":

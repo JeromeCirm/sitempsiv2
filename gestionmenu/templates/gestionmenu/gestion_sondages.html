@@ -137,9 +137,9 @@ function affiche_sondage() {
             item.appendChild(visible)
             let actif=document.createElement('button')
             if (unsondage["actif"]) {
-                actif.innerHTML="actif"
+                actif.innerHTML="modifiable"
             } else {
-                actif.innerHTML="non actif"
+                actif.innerHTML="non modifiable"
             }            
             actif.setAttribute("onclick",'change_etat("actif",'+String(unsondage.id)+','+String(unsondage.actif)+')')
             item.appendChild(actif)
