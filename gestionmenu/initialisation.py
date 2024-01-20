@@ -169,25 +169,25 @@ def maj_semaines(context,liste,annee):
             semaine=semaine+unesemaine
         flag=not flag
 
-def supprime_creneaux(context,matiere=""):
+def supprime_creneaux(context,matiere="",depart=1):
     try:
-        CreneauxColleurs.objects.filter(matière=matiere).delete()
+        CreneauxColleurs.objects.filter(matière=matiere,numero__gte=depart).delete()
     except:
         context["msg"].append("!!! impossible de supprimer les créneaux de "+matiere)
 
-def maj_creneaux_colleurs(context,liste,garde_ancien=False):
+def maj_creneaux_colleurs(context,liste,garde_ancien=False,depart=1):
     if not garde_ancien:
         CreneauxColleurs.objects.all().delete()
-    numero=1
+    numero=depart
     for item in liste:
         user=User.objects.get(username=item[0])
         matiere=InfoColleurs.objects.get(colleur=user).matière
         CreneauxColleurs(colleur=user,jour=item[1],horaire=item[2],salle=item[3],matière=matiere,numero=numero).save()
         numero+=1
 
-def maj_groupes_colles(context,liste):
-    GroupeColles.objects.all().delete()
-    numero=1
+def maj_groupes_colles(context,liste,depart=1):
+    GroupeColles.objects.filter(numero__gte=depart).delete()
+    numero=depart
     for item in liste:
         gr=GroupeColles(numero=numero)
         gr.save()
