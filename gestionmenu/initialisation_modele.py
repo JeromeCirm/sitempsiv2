@@ -195,6 +195,21 @@ dico_inscriptions_colles_individuelles=[
     { "responsables" : ["prof_philo"], "matiere" : "philo","titre" : "philosophie","max_par_eleve" : 3 , "max_garanti" : 2}
 ]
 
+bilan = [('Sept.', 1, 3),
+         ('Octobre', 4, 5),
+         ('Novembre', 6, 9),
+         ('Décembre', 10, 12), # 12 est chomé en principe
+         ('Janvier', 13, 16),
+         ('Février', 17, 18),
+         ('Mars', 19, 21),
+         #('Avril', 1, 4),
+         ('av. écrit', 1, 21), # soit 20 semaines (pas 12)
+         ('Mai', 22, 23),
+         ('Juin', 24, 26),
+         ("à l'année", 1, 26) # on rajoute bien 5 sem pour l'oral en maths
+         # 12 = vide
+         ]
+
 def init_complete_perso(context):
     creation_comptes_prof(context)
     init_menu(context)

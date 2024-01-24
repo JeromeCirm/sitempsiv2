@@ -24,7 +24,8 @@ import datetime
 liste_menus_defaut = ['liste_fichiers','parametres_compte','gestion_menu','fichier_unique','initialisation','contacts',
                       'programme_colle','rentrer_notes_colles',
                       'lire_notes_colles','lire_notes_colleurs','lire_fiches_eleves','fiche_renseignements',
-                      'creation_fichier_pronote','colloscope','colloscope_semaine','gestion_colles','gestion_sondages','sondages','resultat_sondages']
+                      'creation_fichier_pronote','colloscope','colloscope_semaine','gestion_colles','gestion_sondages',
+                      'sondages','resultat_sondages','bilan_colleurs']
 
 def liste_fichiers(request,id_menu,context):
     le_menu=Menu.objects.get(id=id_menu)
@@ -477,4 +478,45 @@ def sondages(request,id_menu,context):
 
 def resultat_sondages(request,id_menu,context): 
     return render(request,'gestionmenu/resultat_sondages.html',context)
+
+def bilan_colleurs(request,id_menu,context):
+    if True: #try:
+        if est_prof(request.user) or est_colleur(request.user) or est_gestionnaire_colle(request.user):
+
+            if est_prof(request.user):
+                context["prof"]="oui"
+                info = InfoColleurs.objects.filter(colleur=request.user)[0]
+                debug(info)
+                matiere = info.matière
+                l=[]
+                for x in InfoColleurs.objects.all(): #.distinct()
+                    #if matiere == x.matière:   # fonctionnement normal
+                    if matiere == x.matière or \
+                        (matiere == 'math' and x.matière=='philo'): # voir aussi la philo
+                        # matiere == 'math' : rajout pour que le prof de maths puisse tout voir
+                        l.append(x.colleur)
+                l.sort(key=lambda x: x.username)
+                context["listecolleurs"]=l
+            else:
+                context["prof"]="colleur"
+            if request.method=='POST':
+                if "colleur" in request.POST:
+                    context["actuel"]=User.objects.get(username=request.POST["colleur"])
+                    # on réactualise actuel avec la sélection (si prof)
+            else:
+                context["actuel"]=request.user
+                # par défaut
+            info = InfoColleurs.objects.filter(colleur=context["actuel"])
+            context['matiere'] = info[0].matière
+            L = faitbilan(context["actuel"], bilan, context['matiere'])
+            context["Laafficher"] = L
+            return render(request,'gestionmenu/menu_bilan.html',context)
+        else:
+            debug("tentative de piratage bilan_colleurs")
+            return redirect('/home')
+    #except:
+        debug("erreur dans bilan_colleurs")
+        return redirect('/home')
+
+
 

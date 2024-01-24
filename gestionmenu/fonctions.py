@@ -244,3 +244,149 @@ def download_file(request,letype,pk,id_menu=0):
     debug("tentative de piratage download")
     return redirect('/home')
  
+def trouvegroupe(eleve, grps):
+    '''
+    il exixste sûrement mieux !
+    '''
+    for g in grps:
+        if grps.filter(pk=g.pk, eleves__pk=eleve.pk).exists():
+            return g
+    return None
+
+def nbang(nb):
+    h, minu = nb // 3, nb % 3
+    minu *= 20
+    if minu:
+        return '{}h{}min'.format(h, minu)
+    else:
+        return '{}h'.format(h)
+
+def nbphilo(nb):
+    h, minu = nb // 2, nb % 2
+    minu *= 30
+    if minu:
+        return '{}h{}min'.format(h, minu)
+    else:
+        return '{}h'.format(h)
+
+def faitbilan(colleur, bilan, matiere):
+    '''
+    on l'appelle avec
+    bilan = variable globale définie dans initialisation_perso
+    [('Sept-Oct', 1, 5),
+    ('Novembre', 6, 9), etc. ]
+    '''
+
+    # créneaux du colleur
+    creneaux=CreneauxColleurs.objects.filter(colleur=colleur)
+    # colles [groupe] dans ces créneaux (du colleur)
+    colles=Colloscope.objects.filter(creneau__in=creneaux)
+    # # colles individuelles dans ces créneaux (du colleur)
+    # collesind=Colloscope.objects.filter(creneau__in=creneaux)
+    # notes du colleur
+    Notes = NotesColles.objects.filter(colleur=colleur)
+    # groupes de colles
+    grps = GroupeColles.objects.all()
+
+    def calcul(mois, s1, s2):
+        '''
+        calcul à partir des groupes prévus par le colloscope, pas les colles individuelles
+        '''
+        cptgrptheo = 0 # nombre de groupe avec au moins un élève interrogé
+        cpteleve = 0 # nobre d'élèves interrogés
+        scolles = colles.filter(semaine__numero__range=[s1,s2])
+
+        # méthode 1 seulement les colles officielles
+        for item in scolles:
+            els = item.groupe.eleves.all()
+            cptgrp = False
+            # on détermine pour un groupe s'il y a au moins une note
+            # (et on décompte les élèves)
+            for el in els:
+                note = Notes.filter(eleve=el, semaine=item.semaine)
+                if note: # il y a bien une note (rappel: pour ce colleur)
+                    cpteleve += 1
+                    cptgrp = True # donc on compte tout le groupe
+                    # debug(note[0].note, el.username)
+            if cptgrp:
+                cptgrptheo += 1
+        # comptage par colloscope
+
+        # méthode 2, plus fine
+        # comptage des notes hors colloscope (inclure les colle individuelles de Jérôme ?? à comprendre et faire)
+        cptsupp = 0
+        # comptage sur toutes les notes
+        cptvraiel = 0
+        verbose = ''
+        # complexité pourrie
+        for note in Notes:
+            if note.note and s1 <= note.semaine.numero <= s2:
+                cptvraiel += 1      # note à décompter
+                grcolle = trouvegroupe(note.eleve, grps)
+                if len(scolles.filter(semaine=note.semaine, groupe=grcolle)) == 0:
+                    # note en plus de celle du colloscope à décompter
+                    verbose += '{} en s.{}, '.format(note.eleve.username, note.semaine)
+                    cptsupp += 1
+
+        return {'mois': mois, 's1': s1, 's2': s2, 'cpteleve': cpteleve,
+                'cptgrptheo': cptgrptheo,
+                'nbheures': cptgrptheo,
+                'cptsupp': cptsupp,
+                'cptvraiel': cptvraiel,
+                'nbangheures': nbang(cptvraiel),
+                'verbose': verbose}
+
+    def calculphilo(mois, s1, s2):
+        '''
+        calcul à partir des groupes prévus par le colloscope, pas les colles individuelles
+        '''
+        #cptgrptheo = 0 # nombre de groupe avec au moins un élève interrogé
+        cpteleve = 0 # nobre d'élèves interrogés
+        #scolles = colles.filter(semaine__numero__range=[s1,s2])
+
+        # # méthode 2, plus fine
+        # # comptage des notes hors colloscope (inclure les colle individuelles de Jérôme ?? à comprendre et faire)
+        # cptsupp = 0
+        # comptage sur toutes les notes
+        cptvraiel = 0 # nombre d'élèves interrogés (note ou n.n. mais pas abs.)
+        cptabs = 0  # nombre d'absents
+        verbose = ''
+        # complexité pourrie
+        for note in Notes: # != 0 peut-être à modifier...
+            if note.note != 0 and s1 <= note.semaine.numero <= s2 and note.creneau in creneaux:
+                # si note.creneau existe c'est bien une colle individuelle
+                if note.note == -1:  # absent
+                    cptabs += 1
+                    verbose += '{} absent en s.{}, '.format(note.eleve.username, note.semaine)
+                else:
+                    #verbose += '{} noté en s.{}, '.format(note.eleve.username, note.semaine)
+                    cptvraiel += 1      # note à décompter
+                    # note en plus de celle du colloscope à décompter
+
+
+        return {'mois': mois, 's1': s1, 's2': s2, 'cpteleve': 0,
+                'cptgrptheo': 0,
+                'nbheures': 0,
+                'cptsupp': cptabs,
+                'cptvraiel': cptvraiel,
+                'nbangheures': nbphilo(cptvraiel),
+                'verbose': verbose}
+
+
+    L = []
+    if matiere != 'philo':
+        for mois, s1, s2 in bilan:
+            L.append(calcul(mois, s1, s2))
+    else:
+        for mois, s1, s2 in bilan:
+            L.append(calculphilo(mois, s1, s2))
+        # pass # à faire
+        # L = [{'mois': 'cc', 's1': 1, 's2': 2, 'cpteleve': 20,
+                # 'cptgrptheo': 21,
+                # 'nbheures': 22,
+                # 'cptsupp': 23,
+                # 'cptvraiel': 24,
+                # 'nbangheures': 25,
+                # 'verbose': 'verbbbb'}]
+
+    return L

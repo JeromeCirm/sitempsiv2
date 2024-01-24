@@ -4,64 +4,83 @@
 {% block body %}
 {% csrf_token %}
 
-<DIV style="text-align:center"> 
-    {% if prof == 'oui' %} 
+<DIV style="text-align:center">
+    {% if prof == 'oui' %}
         Changer pour le bilan du colleur : <form method="POST" id='formcolleur' action="">{% csrf_token %}
         <select id="colleur" onchange="this.form.submit()" name="colleur" type="select">
             {% for item in listecolleurs %}
-            <option value="{{ item.username }}" {% if item.username == actuel.username %} selected {% endif %}> {{ item.first_name}} {{ item.last_name }}</option> 
+            <option value="{{ item.username }}" {% if item.username == actuel.username %} selected {% endif %}> {{ item.first_name}} {{ item.last_name }}</option>
             {% endfor %}
         </select> </form>
-    {% else %} 
+    {% else %}
         Bilan pour le colleur {{ actuel.first_name}} {{ actuel.last_name }}
     {% endif %}
-    
+
 </DIV>
 
 <DIV style="text-align:center">
 {% if matiere == 'anglais' %}
     <par>
     {% for l in Laafficher %}
-    <!-- <input name="alire" size=14 value="{{ l.mois }} ({{ l.s1 }}-{{ l.s2 }})" disabled>
-    <input name="alire" size=90 value="total élèves interrogés: {{ l.cptvraiel }}" disabled>
-    <input name="alire" size=22 style="font-weight: bold;" value="bilan: {{ l.nbangheures }}" disabled> -->
+        <!-- <input name="alire" size=14 value="{{ l.mois }} ({{ l.s1 }}-{{ l.s2 }})" disabled>
+        <input name="alire" size=90 value="total élèves interrogés: {{ l.cptvraiel }}" disabled>
+        <input name="alire" size=22 style="font-weight: bold;" value="bilan: {{ l.nbangheures }}" disabled> -->
 
-    <input name="alire" class="inputmobilemarc6" style="font-weight: bold;" value="{{ l.mois }} ({{ l.s1 }}-{{ l.s2 }})" disabled>
-    <input name="alire" class="inputmobilemarc4" value="total élèves interrogés: {{ l.cptvraiel }}" disabled>
-    <input name="alire" class="inputmobilemarc7" style="font-weight: bold;" value="bilan: {{ l.nbangheures }}" disabled>
-    <BR>
+        <input name="alire" class="inputmobilemarc6" style="font-weight: bold;" value="{{ l.mois }} ({{ l.s1 }}-{{ l.s2 }})" disabled>
+        <input name="alire" class="inputmobilemarc4" value="total élèves interrogés: {{ l.cptvraiel }}" disabled>
+        <input name="alire" class="inputmobilemarc7" style="font-weight: bold;" value="bilan: {{ l.nbangheures }}" disabled>
+        <BR>
     {% endfor %}
     </par>
-{% else %} 
+{% elif matiere == 'philo' %}
     <par>
     {% for l in Laafficher %}
-    <!-- <input name="alire" size=14 value="{{ l.mois }} ({{ l.s1 }}-{{ l.s2 }})" disabled>
-    <input name="alire" size=90 value="{{ l.cptgrptheo }} groupes interrogés soit {{ l.nbheures }}h ({{ l.cpteleve }} dans ces groupes)" disabled>
-    <input name="alire" size=22 style="font-weight: bold;" value="Total {{ l.mois }}: {{ l.nbheures }}h" disabled> -->
+        <!-- <input name="alire" size=14 value="{{ l.mois }} ({{ l.s1 }}-{{ l.s2 }})" disabled>
+        <input name="alire" size=90 value="total élèves interrogés: {{ l.cptvraiel }}" disabled>
+        <input name="alire" size=22 style="font-weight: bold;" value="bilan: {{ l.nbangheures }}" disabled> -->
 
-    <input name="alire" class="inputmobilemarc6" style="font-weight: bold;" value="{{ l.mois }} ({{ l.s1 }}-{{ l.s2 }})" disabled>
-    <input name="alire" class="inputmobilemarc4" value="{{ l.cptgrptheo }} groupes interrogés soit {{ l.nbheures }}h ({{ l.cpteleve }} dans ces groupes)" disabled>
-    <input name="alire" class="inputmobilemarc7" style="font-weight: bold;" value="Total {{ l.mois }}: {{ l.nbheures }}h" disabled>
-    <BR>
-    <!-- <input name="alire" size=14 value="" disabled>
-    <input name="alire" size=120 value="{{ l.cptsupp }} élèves interrogés en plus du colloscope prévu, total élèves interrogés: {{ l.cptvraiel }}" disabled> -->
-    <input name="alire" class="inputmobilemarcfacultatif" value="" disabled>
-    <input name="alire" class="inputmobilemarc8long" value="{{ l.cptsupp }} élèves interrogés en plus du colloscope prévu, total élèves interrogés: {{ l.cptvraiel }}" disabled>
+        <input name="alire" class="inputmobilemarc6" style="font-weight: bold;" value="{{ l.mois }} ({{ l.s1 }}-{{ l.s2 }})" disabled>
+        <input name="alire" class="inputmobilemarc4" value="total élèves interrogés: {{ l.cptvraiel }}{% if l.cptsupp == 1 %}, {{ l.cptsupp }} absent{% elif l.cptsupp > 1 %}, {{ l.cptsupp }} absents{% endif %}" disabled>
+        <input name="alire" class="inputmobilemarc7" style="font-weight: bold;" value="bilan: {{ l.nbangheures }}" disabled>
+        <BR>
+        {% if l.cptsupp > 0 %}
+            <input name="alire" class="inputmobilemarcfacultatif" value="" disabled>
+            <input name="alire" class="inputmobilemarc8long" value="{{ l.cptsupp }} élève(s) absent(s) ({{ l.verbose }})" disabled>
+            <BR>
+        {% endif %}
 
-    <BR>
-    {% if l.verbose %}   
-    <!-- <input name="alire" size=14 value="" disabled>
-    <input name="alire" size=120 value="({{ l.verbose }})" disabled> -->
-    <input name="alire" class="inputmobilemarcfacultatif" value="" disabled>
-    <input name="alire" class="inputmobilemarc8long" value="({{ l.verbose }})" disabled>
-    
-    <BR>
-    {% endif %}
+    {% endfor %}
+    </par>
+{% else %}
+    <par>
+    {% for l in Laafficher %}
+        <!-- <input name="alire" size=14 value="{{ l.mois }} ({{ l.s1 }}-{{ l.s2 }})" disabled>
+        <input name="alire" size=90 value="{{ l.cptgrptheo }} groupes interrogés soit {{ l.nbheures }}h ({{ l.cpteleve }} dans ces groupes)" disabled>
+        <input name="alire" size=22 style="font-weight: bold;" value="Total {{ l.mois }}: {{ l.nbheures }}h" disabled> -->
+
+        <input name="alire" class="inputmobilemarc6" style="font-weight: bold;" value="{{ l.mois }} ({{ l.s1 }}-{{ l.s2 }})" disabled>
+        <input name="alire" class="inputmobilemarc4" value="{{ l.cptgrptheo }} groupes interrogés soit {{ l.nbheures }}h ({{ l.cpteleve }} dans ces groupes)" disabled>
+        <input name="alire" class="inputmobilemarc7" style="font-weight: bold;" value="Total {{ l.mois }}: {{ l.nbheures }}h" disabled>
+        <BR>
+        <!-- <input name="alire" size=14 value="" disabled>
+        <input name="alire" size=120 value="{{ l.cptsupp }} élèves interrogés en plus du colloscope prévu, total élèves interrogés: {{ l.cptvraiel }}" disabled> -->
+        <input name="alire" class="inputmobilemarcfacultatif" value="" disabled>
+        <input name="alire" class="inputmobilemarc8long" value="{{ l.cptsupp }} élèves interrogés en plus du colloscope prévu, total élèves interrogés: {{ l.cptvraiel }}" disabled>
+
+        <BR>
+        {% if l.verbose %}
+        <!-- <input name="alire" size=14 value="" disabled>
+        <input name="alire" size=120 value="({{ l.verbose }})" disabled> -->
+        <input name="alire" class="inputmobilemarcfacultatif" value="" disabled>
+        <input name="alire" class="inputmobilemarc8long" value="({{ l.verbose }})" disabled>
+
+        <BR>
+        {% endif %}
     {% endfor %}
     </par>
 {% endif %}
 
 </DIV>
 
-
+<br><br>
 {% endblock body %}
