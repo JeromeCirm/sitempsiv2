@@ -34,7 +34,7 @@ from base.settings import TITRE_SITE
 def menu(request,numero):
     context={"menu":menu_navigation(request)}
     context["titresite"]=TITRE_SITE
-    if True: #try:
+    try:
         lemenu=Menu.objects.get(pk=numero) 
         if autorise_menu(request.user,lemenu):
             nom_fonction=str(lemenu.fonction)
@@ -43,7 +43,7 @@ def menu(request,numero):
             elif nom_fonction in liste_menus_defaut:
                 return globals()[str(nom_fonction)](request,numero,context)
         return redirect('/home')
-    #except:
+    except: # penser à enlever
         debug('erreur dans la fonction : enlever try except de la fonction menu de views.py')
         return redirect('/home')
 
