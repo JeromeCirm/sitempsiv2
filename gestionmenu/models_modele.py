@@ -226,3 +226,14 @@ class SondagesReponse(models.Model):
     utilisateur=models.ForeignKey(User,on_delete=models.CASCADE)
     reponse=models.TextField(null=True,blank=True)
     sondage=models.ForeignKey(Sondages,on_delete=models.CASCADE)
+
+class PrecisionColle(models.Model):
+    colleindiv=models.ForeignKey(Colloscope_individuel,on_delete=models.CASCADE,null=True,blank=True,default=None)
+    # colleindiv en cas de commentaire pour la colle d'un élève, inutile sinon
+    collegroupe=models.ForeignKey(Colloscope,on_delete=models.CASCADE,null=True,blank=True,default=None) 
+    # collegroupe en cas de commentaire pour un groupe entier, inutile sinon
+    text=models.CharField(max_length=1000,null=True,blank=True)
+    def uploadpath(self,filename):
+       return 'private_files/precisioncolle/'+str(self.id)+extension(self.nomfichier)
+    fichier=models.FileField(null=True,blank=True,upload_to=uploadpath)
+    nomfichier=models.CharField(max_length=100,null=True,blank=True)

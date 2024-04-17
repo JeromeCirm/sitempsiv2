@@ -818,6 +818,7 @@ def recuperation_creneaux_individuels(request):
             lescreneaux=CreneauxColleurs.objects.filter(matière=lamatiere.matiere)
             lescolles=Colloscope_individuel.objects.filter(creneau__in=lescreneaux)
             dico_semaine={ item.numero : {"date" : date_fr(item.date,True),"lundi" : [], "mardi" : [], "mercredi" : [], "jeudi" : [], "vendredi" : [], "samedi" : [],"autre_jour" : []} for item in lessemaines}
+            lesprecisions=PrecisionColle.objects.all()
             for unecolle in lescolles:
                 lejour=unecolle.creneau.jour
                 if lejour not in ["lundi","mardi","mercredi","jeudi","vendredi","samedi"]:
@@ -834,8 +835,16 @@ def recuperation_creneaux_individuels(request):
                 else:
                     etat="s'inscrire"
                     leleve="non attribué"
+                if unecolle.eleve==request.user:
+                    try:# patch pour rajouter les précisions sur la colle voulue
+                        laprecision=lesprecisions.get(colleindiv=unecolle)
+                        precision="oui" # une précision est rentrée
+                    except:
+                        precision="vide"
+                else:
+                    precision="non"  # la colle n'est pas pour l'élève
                 dico_semaine[unecolle.semaine.numero][lejour].append((lejour+" à "+unecolle.creneau.horaire+" en "+unecolle.creneau.salle+" avec "+unecolle.creneau.colleur.first_name
-                                                                      +" "+unecolle.creneau.colleur.last_name+" : "+leleve,etat,unecolle.id))
+                                                                      +" "+unecolle.creneau.colleur.last_name+" : "+leleve,etat,unecolle.id,precision))
             response_data["creneaux"]=dico_semaine
             response_data["creneaux_occupes"]=len(Colloscope_individuel.objects.filter(creneau__in=lescreneaux,eleve=request.user))
         else:
@@ -872,6 +881,10 @@ def action_creneaux_individuels(request):
                 if lecreneau.eleve==request.user:
                     lecreneau.eleve=None
                     lecreneau.save() 
+                    try: # on efface la précision si elle existe
+                        PrecisionColle.objects.get(colleindiv=lecreneau).delete()
+                    except:
+                        pass
                     lescreneaux=CreneauxColleurs.objects.filter(matière=lamatiere.matiere)
                     lescolles=Colloscope_individuel.objects.filter(creneau__in=lescreneaux,eleve=request.user)
                     garanti=len(lescolles.filter(optionnel=False))
@@ -906,6 +919,7 @@ def recuperation_creneaux_individuels_gestionnaire(request):
         lamatiere=Gestion_colles_individuelles.objects.get(matiere=request.POST["matiere"])
         if request.user in lamatiere.responsables.all():
             lessemaines=Semaines.objects.all()
+            lesprecisions=PrecisionColle.objects.all()
             lescreneaux=CreneauxColleurs.objects.filter(matière=lamatiere.matiere)
             lescolles=Colloscope_individuel.objects.filter(creneau__in=lescreneaux)
             dico_semaine={ item.numero : {"date" : date_fr(item.date,True),"lundi" : [], "mardi" : [], "mercredi" : [], "jeudi" : [], "vendredi" : [], "samedi" : [],"autre_jour" : []} for item in lessemaines}
@@ -916,11 +930,17 @@ def recuperation_creneaux_individuels_gestionnaire(request):
                 if unecolle.eleve!=None:
                     leleve=unecolle.eleve.first_name+" "+unecolle.eleve.last_name
                     username=unecolle.eleve.username
+                    try:# patch pour rajouter les précisions sur la colle voulue
+                        laprecision=lesprecisions.get(colleindiv=unecolle)
+                        precision="oui" # une précision est rentrée
+                    except:
+                        precision="vide" 
                 else:
                     leleve="non attribué"
                     username=""
+                    precision="non"
                 dico_semaine[unecolle.semaine.numero][lejour].append((lejour+" à "+unecolle.creneau.horaire+" en "+unecolle.creneau.salle+" avec "+unecolle.creneau.colleur.first_name
-                                                                      +" "+unecolle.creneau.colleur.last_name+" : "+leleve,unecolle.id,username))
+                                                                      +" "+unecolle.creneau.colleur.last_name+" : "+leleve,unecolle.id,username,precision))
             response_data["creneaux"]=dico_semaine
         else:
             debug("tentative de piratage recuperation_creneaux_individuels_gestionnaire")
@@ -985,6 +1005,46 @@ def recupere_commentaire_notes_colles(request):
         response_data["texte"]=""
         debug("erreur dans recupere_commentaire_notes_colles ou bien commentaire vide")
     return HttpResponse(json.dumps(response_data), content_type="application/json") 
+
+@auth(None)
+def maj_precision_colles(request):
+    response_data = {}
+    try:
+        lacolle=Colloscope_individuel.objects.get(id=request.POST["id_colle"])
+        if lacolle.eleve==request.user or lacolle.creneau.colleur==request.user or est_gestionnaire_colle(request.user,lacolle.creneau.colleur): 
+            texte=request.POST['texte']
+            try:
+                lapreci=PrecisionColle.objects.get(colleindiv=lacolle)
+                if texte!="":
+                    lapreci.text=texte
+                    lapreci.save()
+                else:
+                    lapreci.delete()
+            except:
+                if texte!="":
+                    lapreci=PrecisionColle(colleindiv=lacolle,text=texte)
+                    lapreci.save()
+        else:
+            debug("tentative de piratage maj_precision_colles")
+    except:
+        debug("erreur dans maj_precision_colles")
+    return HttpResponse(json.dumps(response_data), content_type="application/json")      
+
+@auth(None)
+def recupere_precision_colles(request):
+    response_data = {}
+    try:
+        lacolle=Colloscope_individuel.objects.get(id=request.POST["id_colle"])
+        lapreci=PrecisionColle.objects.get(colleindiv=lacolle)
+        if lacolle.eleve==request.user or lacolle.creneau.colleur==request.user or est_gestionnaire_colle(request.user,lacolle.creneau.colleur): 
+            response_data["texte"]=lapreci.text
+        else:
+            debug("tentative de piratage recupere_precision_colles")
+    except:
+        response_data["texte"]=""
+        debug("erreur dans recupere_precision_colles ou bien commentaire vide")
+    return HttpResponse(json.dumps(response_data), content_type="application/json") 
+
 
 @auth(None)
 def modifie_creneau(request):

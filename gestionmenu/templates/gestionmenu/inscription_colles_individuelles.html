@@ -53,6 +53,18 @@ function affiche_creneaux(creneaux,creneaux_occupes) {
                 var item=document.createElement('span')
                 item.innerHTML=" "+element[0]
                 liste_creneau.appendChild(item)
+                if (element[3]=="vide" || element[3]=="oui") {
+                    let com=document.createElement('button')
+                    com.setAttribute('type','button')
+                    com.innerHTML='C'
+                    if ( element[3]!= "vide" ) {
+                        com.setAttribute('style','color:black;background-color:lightgray')
+                    } else {
+                        com.setAttribute('style','color:lightgray;background-color:lightgray')
+                    }
+                    com.setAttribute('onclick','maj_precision("'+element[2]+'")')
+                    liste_creneau.appendChild(com)
+                } 
                 liste_creneau.appendChild(document.createElement("br"))
             }); }
         } 
@@ -79,8 +91,53 @@ function action(etat,id) {
                 .catch(function(err){ console.log('Erreur requête', err);});
         }
 
+function maj_precision(id_colle) {
+    var formData = new FormData();
+        formData.append('id_colle', id_colle);
+        csrf=document.getElementsByName('csrfmiddlewaretoken')[0] 
+        formData.append('csrfmiddlewaretoken',csrf.value)
+        fetch("/recupere_precision_colles", {
+          method : 'POST',
+          headers : {
+            'Accept': 'application/json, text/plain, */*',
+            },
+            body: formData
+        }).then(function(res){ return res.json();})
+          .then(function(res){
+            
+    var new_texte;
+    bootbox.prompt({
+                                title: 'Précision pour la colle : ',
+                                inputType: 'textarea',
+                                value : res["texte"],
+                                callback: function (new_texte) {
+    if (new_texte != null) {
+        var formData = new FormData();
+        formData.append('id_colle', id_colle);
+        formData.append('texte', new_texte);
+        csrf=document.getElementsByName('csrfmiddlewaretoken')[0]
+        formData.append('csrfmiddlewaretoken',csrf.value)
+        fetch("/maj_precision_colles", {
+          method : 'POST',
+          headers : {
+            'Accept': 'application/json, text/plain, */*',
+            },
+            body: formData
+        }).then(function(res){ return res.json();})
+          .then(function(res){
+            maj_creneau()
+           })
+            .catch(function(err){ console.log('Erreur requête', err);});
+    } 
+}
+                                });
+                            })
+            .catch(function(err){ console.log('Erreur requête', err);});
+
+}
 
 
-maj_creneau()
+
+maj_creneau() 
 </script>
 {% endblock body %}

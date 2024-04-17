@@ -47,5 +47,7 @@ urlpatterns = urlpatterns_perso+[
     path('recuperation_notes_colles_semaine',views.recuperation_notes_colles_semaine,name='recuperation_notes_colles_semaine'),
     path('creation_sondage',views.creation_sondage,name='creation_sondage'),
     path('sondage',views.sondage,name='sondage'),
+    path('maj_precision_colles',views.maj_precision_colles,name='maj_precision_colles'),
+    path('recupere_precision_colles',views.recupere_precision_colles,name='recupere_precision_colles'),
     path('resultat_sondage',views.resultat_sondage,name='resultat_sondage'),
     ]
