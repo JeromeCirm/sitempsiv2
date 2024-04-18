@@ -812,7 +812,7 @@ def creation_creneaux_eleve(request):
 def recuperation_creneaux_individuels(request):
     response_data = {}
     try:
-        if est_eleve(request.user):
+        if est_eleve(request.user) or est_colleur(request.user):
             lamatiere=Gestion_colles_individuelles.objects.get(matiere=request.POST["matiere"])
             lessemaines=Semaines.objects.all()
             lescreneaux=CreneauxColleurs.objects.filter(matière=lamatiere.matiere)
@@ -825,17 +825,23 @@ def recuperation_creneaux_individuels(request):
                     lejour="autre_jour"
                 if unecolle.eleve!=None:
                     leleve=unecolle.eleve.first_name+" "+unecolle.eleve.last_name
-                    if unecolle.eleve==request.user:
-                        etat="se désinscrire"
-                    else:
-                        if unecolle.optionnel:
-                            etat="remplacer"
+                    if est_eleve(request.user):
+                        if unecolle.eleve==request.user:
+                            etat="se désinscrire"
                         else:
-                            etat="occupé"
+                            if unecolle.optionnel:
+                                etat="remplacer"
+                            else:
+                                etat="occupé"
+                    else:
+                        etat="occupé"
                 else:
-                    etat="s'inscrire"
+                    if est_eleve(request.user):
+                        etat="s'inscrire"
+                    else:
+                        etat="occupé"
                     leleve="non attribué"
-                if unecolle.eleve==request.user:
+                if unecolle.eleve==request.user or unecolle.creneau.colleur==request.user:
                     try:# patch pour rajouter les précisions sur la colle voulue
                         laprecision=lesprecisions.get(colleindiv=unecolle)
                         precision="oui" # une précision est rentrée
@@ -1036,7 +1042,7 @@ def recupere_precision_colles(request):
     try:
         lacolle=Colloscope_individuel.objects.get(id=request.POST["id_colle"])
         lapreci=PrecisionColle.objects.get(colleindiv=lacolle)
-        if lacolle.eleve==request.user or lacolle.creneau.colleur==request.user or est_gestionnaire_colle(request.user,lacolle.creneau.colleur): 
+        if lacolle.eleve==request.user or lacolle.creneau.colleur==request.user or est_gestionnaire_colle(request.user,lacolle.creneau.colleur) or est_colleur(request.user): 
             response_data["texte"]=lapreci.text
         else:
             debug("tentative de piratage recupere_precision_colles")
