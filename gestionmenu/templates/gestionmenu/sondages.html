@@ -36,9 +36,11 @@ function affiche_sondage(reponse) {
         sondage=reponse[id]
         if (sondage["type_sondage"]=="choix") {
               let unsondage=document.createElement('p')
-              let titre=document.createElement('label')
-              titre.innerHTML=sondage["titre"]
-              unsondage.appendChild(titre)
+              if (sondage["titre"]!="") {
+                let titre=document.createElement('label')
+                titre.innerHTML=sondage["titre"]
+                unsondage.appendChild(titre)
+              }
               unsondage.appendChild(document.createElement('br'))
               let description=document.createElement('span')
               description.innerHTML=sondage["description"]
