@@ -205,6 +205,9 @@ def maj_colloscope(context,liste,a_partir=-1):
         Colloscope(semaine=item[0],groupe=item[1],creneau=item[2]).save()
 
 def importation_fiches_eleves(context,efface=False,remplace_officiel=True,impose_usuel=True):
+    #
+    # à gérer : année courante uniquement ici ou autoriser tout ?
+    #
     # importe à partir du répertoire private_files/transfert_fiche
     # login_annee_json pour le fichier contenant le json du dictionnaire à mettre dans Renseignements
     # login_annee.pdf pour un fichier pdf à mettre en plus de la fiche élève
@@ -225,6 +228,8 @@ def importation_fiches_eleves(context,efface=False,remplace_officiel=True,impose
             ext=name[-4:]
         else:
             context["msg"].append('!!! fichier '+name+' non traité.')
+            continue
+        if annee!=str(annee_courante):
             continue
         try:
             lafiche=Renseignements.objects.get(login=login,année=annee)
