@@ -13,6 +13,9 @@ class MenuAdmin(admin.ModelAdmin):
 class FichierAdmin(admin.ModelAdmin):
     pass
 
+class ProgColleAdmin(admin.ModelAdmin):
+    pass
+
 class SemainesAdmin(admin.ModelAdmin):
     list_display=('numero','date')
 
@@ -58,6 +61,9 @@ class SondagesItemAdmin(admin.ModelAdmin):
 class SondagesReponseAdmin(admin.ModelAdmin):
     pass
 
+class GroupesTDAdmin(admin.ModelAdmin):
+    pass
+    
 admin.site.register(Sondages,SondagesAdmin)
 admin.site.register(SondagesItem,SondagesItemAdmin)
 admin.site.register(SondagesReponse,SondagesReponseAdmin)
@@ -65,6 +71,7 @@ admin.site.register(NotesColles,NotesCollesAdmin)
 admin.site.register(Divers,DiversAdmin)
 admin.site.register(Menu,MenuAdmin)
 admin.site.register(Fichier,FichierAdmin)
+admin.site.register(ProgColle,ProgColleAdmin)
 admin.site.register(Semaines,SemainesAdmin)
 admin.site.register(CreneauxColleurs,CreneauxColleursAdmin)
 admin.site.register(InfoColleurs,InfoColleursAdmin)
@@ -74,4 +81,5 @@ admin.site.register(Renseignements,RenseignementsAdmin)
 admin.site.register(Colloscope_individuel,Colloscope_individuelAdmin)
 admin.site.register(Gestion_colles_individuelles,Gestion_colles_individuellesAdmin)
 admin.site.register(CommentaireColle,CommentaireColleAdmin)
+admin.site.register(GroupesTD,GroupesTDAdmin)
 

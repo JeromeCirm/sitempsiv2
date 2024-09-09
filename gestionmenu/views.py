@@ -34,7 +34,7 @@ from base.settings import TITRE_SITE
 def menu(request,numero):
     context={"menu":menu_navigation(request)}
     context["titresite"]=TITRE_SITE
-    try:
+    if True: #try:
         lemenu=Menu.objects.get(pk=numero) 
         if autorise_menu(request.user,lemenu):
             nom_fonction=str(lemenu.fonction)
@@ -43,7 +43,7 @@ def menu(request,numero):
             elif nom_fonction in liste_menus_defaut:
                 return globals()[str(nom_fonction)](request,numero,context)
         return redirect('/home')
-    except: # penser à enlever
+    #except: # penser à enlever
         debug('erreur dans la fonction : enlever try except de la fonction menu de views.py')
         return redirect('/home')
 
@@ -1273,3 +1273,21 @@ def resultat_sondage(request):
     except:
         debug("erreur dans resultat_sondage")
     return HttpResponse(json.dumps(response_data), content_type="application/json")   
+
+@auth(None)
+def recuperation_informations_groupesTDTP(request):
+    response_data = {}
+    if True: #try:
+        lasemaine=Semaines.objects.get(numero=request.POST["semaine"])  
+        TDTP=GroupesTD.objects.filter(semaine=lasemaine,texte=request.POST["intitule"])
+        lesgroupes=[]
+        leseleves=[]
+        for x in TDTP:
+            lesgroupes.append(x.groupe.numero)
+            for y in x.groupe.eleves.all():
+                leseleves.append(y.username)
+        leseleves.sort()
+        response_data["informations"]={"groupes": lesgroupes,"eleves" : leseleves}
+    #except:
+        debug("erreur dans recuperation_informations_groupesTDTP")
+    return HttpResponse(json.dumps(response_data), content_type="application/json")    

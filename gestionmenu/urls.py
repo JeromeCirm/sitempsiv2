@@ -50,4 +50,5 @@ urlpatterns = urlpatterns_perso+[
     path('maj_precision_colles',views.maj_precision_colles,name='maj_precision_colles'),
     path('recupere_precision_colles',views.recupere_precision_colles,name='recupere_precision_colles'),
     path('resultat_sondage',views.resultat_sondage,name='resultat_sondage'),
+    path('recuperation_informations_groupesTDTP',views.recuperation_informations_groupesTDTP,name='recuperation_informations_groupesTDTP'),
     ]

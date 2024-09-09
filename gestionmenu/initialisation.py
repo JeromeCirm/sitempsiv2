@@ -66,7 +66,8 @@ def maj_comptes_eleves(context,mdp,dico,garde_ancien=False,oblige_changement_mdp
         renseignements.save()
 
 # on ne touche pas à un compte prof
-# on garde un compte colleur si garde_ancien=True
+# on garde un compte colleur si garde_ancien=True et qu'il est dans dico
+# on supprime un colleur s'il n'est pas dans dico quoiqu'il arrive
 def maj_comptes_colleurs(context,mdp,dico,garde_ancien=False,oblige_changement_mdp=True):
     try:
         liste_colleurs=InfoColleurs.objects.values_list("colleur__username",flat=True)

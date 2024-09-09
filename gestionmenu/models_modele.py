@@ -237,3 +237,9 @@ class PrecisionColle(models.Model):
        return 'private_files/precisioncolle/'+str(self.id)+extension(self.nomfichier)
     fichier=models.FileField(null=True,blank=True,upload_to=uploadpath)
     nomfichier=models.CharField(max_length=100,null=True,blank=True)
+
+class GroupesTD(models.Model):
+    semaine=models.ForeignKey(Semaines,on_delete=models.CASCADE)
+    groupe=models.ForeignKey(GroupeColles,on_delete=models.CASCADE,null=True,default=None,blank=True)
+    eleve=models.ForeignKey(User,on_delete=models.CASCADE,null=True,default=None,blank=True)
+    texte=models.TextField(null=True,blank=True)

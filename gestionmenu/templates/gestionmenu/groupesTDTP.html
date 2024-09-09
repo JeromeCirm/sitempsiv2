@@ -1,0 +1,64 @@
+{% extends 'gestionmenu/base.html' %}
+
+{% block body %}
+<BR>
+ <DIV class=cadreinfo style="text-align:center;">
+    <DIV class="textedinfo">
+        <form method="POST" action="">
+            {% csrf_token %}
+            <div> Informations pour la semaine numéro <select id="informations" onchange="maj_informations()">
+                {% for unesemaine in lessemaines %} <option value="{{ unesemaine.numero }}" {% if lasemaine == unesemaine.numero %} selected {% endif %}>{{ unesemaine.numero }} commençant le {{ unesemaine.date }}</option>{% endfor %}
+            </select></div>
+            <div> et l'intitulé <select id="intitule" onchange="maj_informations()">
+                {% for unintitule in lesintitules %} <option value="{{ unintitule }}" {% if lintitule == unintitule %} selected {% endif %}>{{ unintitule }}</option>{% endfor %}
+            </select></div> <BR><BR>
+            <div id="groupes"></div> <BR><BR>
+            <div id="eleves"></div>
+        </form>
+    </DIV>    
+
+ </DIV>   
+
+<script>
+let intitule=document.getElementById("intitule")
+let informations=document.getElementById("informations")
+let groupes=document.getElementById("groupes")
+let eleves=document.getElementById("eleves")
+
+function maj_informations() {
+        var formData = new FormData();
+        formData.append('semaine', informations.value);
+        formData.append('intitule', intitule.value);
+        csrf=document.getElementsByName('csrfmiddlewaretoken')[0]
+        formData.append('csrfmiddlewaretoken',csrf.value)
+        fetch("/recuperation_informations_groupesTDTP", {
+          method : 'POST',
+          headers : {
+            'Accept': 'application/json, text/plain, */*',
+            },
+            body: formData
+        }).then(function(res){ return res.json();})
+          .then(function(res){
+            affiche_informations(res["informations"])
+           })
+            .catch(function(err){ console.log('Erreur requête', err);});
+    }
+
+function affiche_informations(informations) {
+    groupes.innerHTML="liste des groupes : "
+    for (x in informations["groupes"]) {
+        let ligne_texte=document.createElement('span')
+        ligne_texte.innerHTML=(informations["groupes"][x]).toString()+", "
+        groupes.appendChild(ligne_texte)
+    }
+    eleves.innerHTML="liste des élèves : "
+    for (x in informations["eleves"]) {
+        let ligne_texte=document.createElement('span')
+        ligne_texte.innerHTML=(informations["eleves"][x]).toString()+", "
+        eleves.appendChild(ligne_texte)
+    }}
+
+maj_informations()
+</script>
+
+{% endblock body %}

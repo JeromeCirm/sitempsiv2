@@ -12,23 +12,27 @@
 
 from base.fonctions import auth
 from .fonctions import *
-from .models import Semaines
+from .models import Semaines,GroupesTD
 import json
 
 @auth(None)
 def recuperation_informations_home_perso(request):
     response_data = {}
-    try:
+    if True: #try:
         lesgroupes=request.user.groups.all()
         if groupe_eleves in lesgroupes:
             lasemaine=Semaines.objects.get(numero=request.POST["semaine"])  
             msg=informations_colle_semaine_eleve(request.user,lasemaine)
             msg=['Voici les informations de la semaine : ']+msg
+            lesgroupes=GroupeColles.objects.filter(eleves=request.user)
+            lesTD=GroupesTD.objects.filter(semaine=lasemaine,groupe__in=lesgroupes)
+            for x in lesTD:
+                msg.append(x.texte)
             response_data["informations"]=msg
         elif est_colleur(request.user):
             lasemaine=Semaines.objects.get(numero=request.POST["semaine"])  
             msg=informations_colle_semaine_colleur(request.user,lasemaine)
             response_data["informations"]=msg              
-    except:
+    #except:
         debug("erreur dans recuperation_informations_home_perso")
     return HttpResponse(json.dumps(response_data), content_type="application/json")    

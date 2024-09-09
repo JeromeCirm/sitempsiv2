@@ -25,7 +25,7 @@ liste_menus_defaut = ['liste_fichiers','parametres_compte','gestion_menu','fichi
                       'programme_colle','rentrer_notes_colles',
                       'lire_notes_colles','lire_notes_colleurs','lire_fiches_eleves','fiche_renseignements',
                       'creation_fichier_pronote','colloscope','colloscope_semaine','gestion_colles','gestion_sondages',
-                      'sondages','resultat_sondages','bilan_colleurs']
+                      'sondages','resultat_sondages','bilan_colleurs','groupesTDTP']
 
 def liste_fichiers(request,id_menu,context):
     le_menu=Menu.objects.get(id=id_menu)
@@ -117,7 +117,7 @@ def fichier_unique(request,id_menu,context):
         return render(request,'gestionmenu/fichier_unique.html',context)
     
 def initialisation(request,id_menu,context):
-    try: 
+    if True: #try: 
         if request.method=='POST':
             action=request.POST['action']
             if action in liste_initialisation:
@@ -127,7 +127,7 @@ def initialisation(request,id_menu,context):
                 debug("erreur nom fonction initialisation")
         context["lesactions"]=liste_initialisation
         return render(request,'gestionmenu/initialisation.html',context)
-    except:
+    #except:
         debug("erreur dans la fonction initialisation")
         return redirect('/home')
 
@@ -518,5 +518,23 @@ def bilan_colleurs(request,id_menu,context):
         debug("erreur dans bilan_colleurs")
         return redirect('/home')
 
-
+def groupesTDTP(request,id_menu,context): 
+    if True:
+        lessemaines=Semaines.objects.all().order_by("numero")
+        context["lessemaines"]=[{"numero":x.numero,"date":date_fr(x.date,True)} for x in lessemaines]
+        try:
+            context["lasemaine"]=1 #semaine_en_cours().numero
+        except:
+            context["lasemaine"]=0    
+        lesintitules=GroupesTD.objects.all()
+        dico_intitule={}
+        for x in lesintitules:
+            dico_intitule[x.texte]=1
+        context["lesintitules"]=list(dico_intitule.keys())
+        if len(dico_intitule)>0:
+            context["lintitule"]=context["lesintitules"][0]
+        return render(request,'gestionmenu/groupesTDTP.html',context)
+    #except:
+        debug("erreur dans groupesTDTP")
+        return redirect('/home')    
 
