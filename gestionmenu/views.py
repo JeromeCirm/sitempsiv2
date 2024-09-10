@@ -1287,6 +1287,8 @@ def recuperation_informations_groupesTDTP(request):
             for y in x.groupe.eleves.all():
                 leseleves.append(y.username)
         leseleves.sort()
+        if not ( est_prof(request.user) or  est_eleve(request.user)):
+            leseleves=[]
         response_data["informations"]={"groupes": lesgroupes,"eleves" : leseleves}
     #except:
         debug("erreur dans recuperation_informations_groupesTDTP")
