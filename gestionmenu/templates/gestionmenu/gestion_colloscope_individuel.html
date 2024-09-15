@@ -1,0 +1,48 @@
+{% extends 'gestionmenu/base.html' %}
+
+{% block body %}
+
+<h1> Gestion de colloscope individuel </h1>
+<hr>
+<br>
+<form method="POST" id="form_eleve" action="">
+    {% csrf_token %}<div style="text-align:center">
+        <div>
+            <label for="intitule"> Intitulé : </label> 
+            <input  type="text" id="intitule" name="intitule" value="{{ intitule}}">
+        </div><br>
+    <div>
+        <label for="modif_par_eleves">Autoriser les modifications par les élèves : </label> 
+        <input  type="checkbox" id="modif_par_eleves" name="modif_par_eleves" {% if modif_par_eleves %} checked {% endif %}>
+    </div><br>
+    <div>
+        <label for="modif_jour_j_par_eleves">Autoriser les modifications par les élèves pour aujourd'hui: </label> 
+        <input  type="checkbox" id="modif_jour_j_par_eleves" name="modif_jour_j_par_eleves" {% if modif_jour_j_par_eleves %} checked {% endif %}>
+    </div> <br>
+    <div>
+        <label for="colles_max_par_eleve"> Nombre maximal de colles par élèves : </label> 
+        <input  type="text" id="colles_max_par_eleve" name="colles_max_par_eleve" value="{{ colles_max_par_eleve}}">
+    </div><br>
+    <div>
+        <input type="submit" value="Submit"/>
+    </div><br><br>
+    <div>
+
+ {% if colloscope_present %}
+        Etat des inscriptions : <br>
+        {% for key,val in plages.items %} <br>
+        Plage numéro {{ key }} : <br>
+        {% for k,v in val.items %}
+        élèves avec {{ k }} inscriptions : 
+        {% for x in v %} {{ x }}, {% endfor %} <br>
+        {% endfor %}
+        {% endfor %}
+ {% else %}
+ colloscope à créer avant de poursuivre !  à mettre/finir avant le formulaire initial 
+ {% endif %}
+    </div>
+</form>
+<div id="liste_creneau" style="text-align:center">
+</div>
+
+{% endblock body %}

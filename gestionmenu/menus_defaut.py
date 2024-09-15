@@ -25,7 +25,7 @@ liste_menus_defaut = ['liste_fichiers','parametres_compte','gestion_menu','fichi
                       'programme_colle','rentrer_notes_colles',
                       'lire_notes_colles','lire_notes_colleurs','lire_fiches_eleves','fiche_renseignements',
                       'creation_fichier_pronote','colloscope','colloscope_semaine','gestion_colles','gestion_sondages',
-                      'sondages','resultat_sondages','bilan_colleurs','groupesTDTP']
+                      'sondages','resultat_sondages','bilan_colleurs','groupesTDTP','gestion_colloscope_individuel','inscription_colloscope_individuel']
 
 def liste_fichiers(request,id_menu,context):
     le_menu=Menu.objects.get(id=id_menu)
@@ -538,3 +538,59 @@ def groupesTDTP(request,id_menu,context):
         debug("erreur dans groupesTDTP")
         return redirect('/home')    
 
+def gestion_colloscope_individuel(request,id_menu,context): 
+    if True:
+        if request.method=="POST":
+            try:
+                colloscope=Gestion_colloscope_individuel.objects.get(menu__id=id_menu)
+                colloscope.intitule=equest.POST["intitule"]
+                if "modif_par_eleves" in request.POST:
+                    colloscope.modif_par_eleves=True
+                else:
+                    colloscope.modif_par_eleves=False
+                if "modif_jour_j_par_eleves" in request.POST:
+                    colloscope.modif_jour_j_par_eleves=True
+                else:
+                    colloscope.modif_jour_j_par_eleves=False
+                colloscope.colles_max_par_eleve=int(request.POST["colles_max_par_eleve"])
+                colloscope.save()
+            except:
+                #Gestion_colloscope_individuel.objects.filter(menu__id=id_menu).delete()
+                colloscope=Gestion_colloscope_individuel(menu=Menu(id=id_menu),intitule=request.POST["intitule"],
+                colles_max_par_eleve=int(request.POST["colles_max_par_eleve"]))
+                if "modif_par_eleves" in request.POST:
+                    colloscope.modif_par_eleves=True
+                else:
+                    colloscope.modif_par_eleves=False
+                if "modif_jour_j_par_eleves" in request.POST:
+                    colloscope.modif_jour_j_par_eleves=True
+                else:
+                    colloscope.modif_jour_j_par_eleves=False
+                colloscope.save()
+        if True : #try:
+            colloscope=Gestion_colloscope_individuel.objects.get(menu__id=id_menu)
+            context["colloscope_present"]=True
+            context["intitule"]=colloscope.intitule
+            context["modif_par_eleves"]=colloscope.modif_par_eleves
+            context["modif_jour_j_par_eleves"]=colloscope.modif_jour_j_par_eleves
+            context["colles_max_par_eleve"]=colloscope.colles_max_par_eleve
+            lesplages=Gestion_plage_colloscope_individuel.objects.filter(colloscope=colloscope).order_by("semaine_debut")
+            lescolles=Colloscope_individuel.objects.filter(colloscope=colloscope)
+            plages_dico={}
+            for i,val in enumerate(lesplages,start=1):
+                dico={ x : [] for x in range(val.colles_par_eleve+val.colles_optionnelles_par_eleve+1)}
+                plages_dico[i]=dico
+            context["plages"]=plages_dico
+        #except:
+        #    context["colloscope_present"]=False
+        return render(request,'gestionmenu/gestion_colloscope_individuel.html',context)
+    #except:
+        debug("erreur dans gestion_colloscope_individuel")
+        return redirect('/home')   
+
+def inscription_colloscope_individuel(request,id_menu,context): 
+    if True:
+        return render(request,'gestionmenu/inscription_colloscope_individuel.html',context)
+    #except:
+        debug("erreur dans inscription_colloscope_individuel")
+        return redirect('/home')   
