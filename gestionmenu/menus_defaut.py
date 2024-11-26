@@ -523,7 +523,7 @@ def groupesTDTP(request,id_menu,context):
         lessemaines=Semaines.objects.all().order_by("numero")
         context["lessemaines"]=[{"numero":x.numero,"date":date_fr(x.date,True)} for x in lessemaines]
         try:
-            context["lasemaine"]=1 #semaine_en_cours().numero
+            context["lasemaine"]=semaine_en_cours().numero
         except:
             context["lasemaine"]=0    
         lesintitules=GroupesTD.objects.all()
