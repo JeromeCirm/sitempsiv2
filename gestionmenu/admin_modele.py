@@ -88,6 +88,6 @@ admin.site.register(Colloscope_individuel,Colloscope_individuelAdmin)
 admin.site.register(Gestion_colles_individuelles,Gestion_colles_individuellesAdmin)
 admin.site.register(CommentaireColle,CommentaireColleAdmin)
 admin.site.register(GroupesTD,GroupesTDAdmin)
-admin.site.register(Gestion_colloscope_individuel,Gestion_colloscope_individuelAdmin)
-admin.site.register(Gestion_plage_colloscope_individuel,Gestion_plage_colloscope_individuelAdmin)
+#admin.site.register(Gestion_colloscope_individuel,Gestion_colloscope_individuelAdmin)
+#admin.site.register(Gestion_plage_colloscope_individuel,Gestion_plage_colloscope_individuelAdmin)
 
