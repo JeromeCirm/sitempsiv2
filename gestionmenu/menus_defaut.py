@@ -480,7 +480,7 @@ def resultat_sondages(request,id_menu,context):
     return render(request,'gestionmenu/resultat_sondages.html',context)
 
 def bilan_colleurs(request,id_menu,context):
-    if True: #try:
+    try:
         if est_prof(request.user) or est_colleur(request.user) or est_gestionnaire_colle(request.user):
 
             if est_prof(request.user):
@@ -514,12 +514,12 @@ def bilan_colleurs(request,id_menu,context):
         else:
             debug("tentative de piratage bilan_colleurs")
             return redirect('/home')
-    #except:
+    except:
         debug("erreur dans bilan_colleurs")
         return redirect('/home')
 
 def groupesTDTP(request,id_menu,context): 
-    if True:
+    try:
         lessemaines=Semaines.objects.all().order_by("numero")
         context["lessemaines"]=[{"numero":x.numero,"date":date_fr(x.date,True)} for x in lessemaines]
         try:
@@ -534,7 +534,7 @@ def groupesTDTP(request,id_menu,context):
         if len(dico_intitule)>0:
             context["lintitule"]=context["lesintitules"][0]
         return render(request,'gestionmenu/groupesTDTP.html',context)
-    #except:
+    except:
         debug("erreur dans groupesTDTP")
         return redirect('/home')    
 

@@ -1277,7 +1277,7 @@ def resultat_sondage(request):
 @auth(None)
 def recuperation_informations_groupesTDTP(request):
     response_data = {}
-    if True: #try:
+    try:
         lasemaine=Semaines.objects.get(numero=request.POST["semaine"])  
         TDTP=GroupesTD.objects.filter(semaine=lasemaine,texte=request.POST["intitule"])
         lesgroupes=[]
@@ -1286,10 +1286,11 @@ def recuperation_informations_groupesTDTP(request):
             lesgroupes.append(x.groupe.numero)
             for y in x.groupe.eleves.all():
                 leseleves.append(y.username)
+        lesgroupes.sort()
         leseleves.sort()
         if not ( est_prof(request.user) or  est_eleve(request.user)):
             leseleves=[]
         response_data["informations"]={"groupes": lesgroupes,"eleves" : leseleves}
-    #except:
+    except:
         debug("erreur dans recuperation_informations_groupesTDTP")
     return HttpResponse(json.dumps(response_data), content_type="application/json")    
