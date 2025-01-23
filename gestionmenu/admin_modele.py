@@ -62,7 +62,7 @@ class SondagesReponseAdmin(admin.ModelAdmin):
     pass
 
 class GroupesTDAdmin(admin.ModelAdmin):
-    pass
+    list_display=('semaine',"groupe",'eleve','texte')
     
 class Gestion_colloscope_individuelAdmin(admin.ModelAdmin):
     pass
