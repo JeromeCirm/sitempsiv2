@@ -243,7 +243,6 @@ def importation_fiches_eleves(context,efface=False,remplace_officiel=True,impose
             context["msg"].append('!!! pas de fiche pour '+login+' en '+annee)
             continue
         if lafiche.rne_lycee!=None and not force_remplacement:
-            print("*",lafiche.rne_lycee,"*")
             context["msg"].append('fiche ignorée pour  '+login+' en '+annee)
             continue
         if ext=='json':
