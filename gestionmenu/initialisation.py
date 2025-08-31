@@ -40,30 +40,35 @@ def maj_comptes_eleves(context,mdp,dico,garde_ancien=False,oblige_changement_mdp
     anciens=User.objects.filter(groups=groupe_eleves)
     if garde_ancien: 
         anciens=anciens.exclude(username__in=dico.keys())
-    doublons=User.objects.filter(username__in=dico.keys())
-    Renseignements.objects.filter(login__in=[x.username for x in anciens],année=annee_courante).delete()
-    anciens.delete()          # on efface tous les anciens élèves.
+    doublons=User.objects.filter(username__in=dico.keys()).exclude(groups=groupe_eleves)
     if len(doublons)!=0:
         msg_s="!!! attention : au moins un login élève est déjà utilisé dans un autre rôle :"    # liste à vérifier, il y a déjà un utilisateur avec ce nom
         for x in doublons:
             msg_s+=" "+x.username+","
         context["msg"].append(msg_s)
         return
+    Renseignements.objects.filter(login__in=[x.username for x in anciens],année=annee_courante).delete()
+    anciens.delete()          # on efface tous les anciens élèves.   
+    eleves_actuels=User.objects.filter(groups=groupe_eleves)
+    logins={}
+    for x in eleves_actuels:
+        logins[x.username]=True
     for uneleve in dico:
-        user=creation_compte(uneleve,mdp,[groupe_eleves],oblige_changement_mdp,dico[uneleve])
-        if user==None:
-            context["msg"].append("!!! erreur lors de la création du compte de "+uneleve)
-            return
-        try:
-            prenomofficiel=dico[uneleve]["prenomofficiel"]
-        except:
-            prenomofficiel=""
-        try:
-            nomofficiel=dico[uneleve]["nomofficiel"]
-        except:
-            nomofficiel=uneleve
-        renseignements=Renseignements.objects.create(login=uneleve,année=annee_courante,nomofficiel=nomofficiel,prenomofficiel=prenomofficiel)
-        renseignements.save()
+        if uneleve not in logins:
+            user=creation_compte(uneleve,mdp,[groupe_eleves],oblige_changement_mdp,dico[uneleve])
+            if user==None:
+                context["msg"].append("!!! erreur lors de la création du compte de "+uneleve)
+                return
+            try:
+                prenomofficiel=dico[uneleve]["prenomofficiel"]
+            except:
+                prenomofficiel=""
+            try:
+                nomofficiel=dico[uneleve]["nomofficiel"]
+            except:
+                nomofficiel=uneleve
+            renseignements=Renseignements.objects.create(login=uneleve,année=annee_courante,nomofficiel=nomofficiel,prenomofficiel=prenomofficiel)
+            renseignements.save()
 
 # on ne touche pas à un compte prof
 # on garde un compte colleur si garde_ancien=True et qu'il est dans dico
@@ -205,7 +210,7 @@ def maj_colloscope(context,liste,a_partir=-1):
     for item in liste:
         Colloscope(semaine=item[0],groupe=item[1],creneau=item[2]).save()
 
-def importation_fiches_eleves(context,efface=False,remplace_officiel=True,impose_usuel=True):
+def importation_fiches_eleves(context,efface=False,remplace_officiel=True,impose_usuel=True,force_remplacement=False):
     #
     # à gérer : année courante uniquement ici ou autoriser tout ?
     #
@@ -236,6 +241,8 @@ def importation_fiches_eleves(context,efface=False,remplace_officiel=True,impose
             lafiche=Renseignements.objects.get(login=login,année=annee)
         except:
             context["msg"].append('!!! pas de fiche pour '+login+' en '+annee)
+            continue
+        if lafiche.rne_lycee!="" and not force_remplacement:
             continue
         if ext=='json':
             try:
