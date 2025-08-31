@@ -228,7 +228,6 @@ def importation_fiches_eleves(context,efface=False,remplace_officiel=True,impose
         context["msg"].append("Impossible d'obtenir le liste des fichiers à importer.")
         return 
     listefichier.sort()
-    print(listefichier)
     for name in listefichier:
         if len(name)>=10:
             login=name[:-9].lower()
