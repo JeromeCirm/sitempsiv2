@@ -413,7 +413,7 @@ def recupere_eleves(request):
         debug("tentative de piratage recupere_eleves")
         return redirect('/home')
     try:
-        r=Renseignements.objects.filter(année=request.POST["annee"])
+        r=Renseignements.objects.filter(année=request.POST["annee"]).order_by("login")
         response_data = {"eleves":[str(x.login) for x in r]}
     except:
         debug("erreur recupere_eleves")
