@@ -185,11 +185,13 @@ def maj_creneaux_colleurs(context,liste,garde_ancien=False,depart=1):
     if not garde_ancien:
         CreneauxColleurs.objects.all().delete()
     numero=depart
+    liste_a_creer=[]
     for item in liste:
         user=User.objects.get(username=item[0])
         matiere=InfoColleurs.objects.get(colleur=user).matière
-        CreneauxColleurs(colleur=user,jour=item[1],horaire=item[2],salle=item[3],matière=matiere,numero=numero).save()
+        liste_a_creer.append(CreneauxColleurs(colleur=user,jour=item[1],horaire=item[2],salle=item[3],matière=matiere,numero=numero))
         numero+=1
+    CreneauxColleurs.objects.bulk_create(liste_a_creer)
 
 def maj_groupes_colles(context,liste,depart=1):
     GroupeColles.objects.filter(numero__gte=depart).delete()
@@ -207,8 +209,10 @@ def maj_groupes_colles(context,liste,depart=1):
 def maj_colloscope(context,liste,a_partir=-1):
     if a_partir>=0:
         Colloscope.objects.filter(semaine__numero__gte=a_partir).delete()
+    liste_a_construire=[]
     for item in liste:
-        Colloscope(semaine=item[0],groupe=item[1],creneau=item[2]).save()
+        liste_a_construire.append(Colloscope(semaine=item[0],groupe=item[1],creneau=item[2]))
+    Colloscope.objects.bulk_create(liste_a_construire)
 
 def importation_fiches_eleves(context,efface=False,remplace_officiel=True,impose_usuel=True,force_remplacement=False):
     #
