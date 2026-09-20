@@ -18,7 +18,7 @@ import json
 @auth(None)
 def recuperation_informations_home_perso(request):
     response_data = {}
-    if True: #try:
+    try:
         lesgroupes=request.user.groups.all()
         if groupe_eleves in lesgroupes:
             lasemaine=Semaines.objects.get(numero=request.POST["semaine"])  
@@ -33,6 +33,6 @@ def recuperation_informations_home_perso(request):
             lasemaine=Semaines.objects.get(numero=request.POST["semaine"])  
             msg=informations_colle_semaine_colleur(request.user,lasemaine)
             response_data["informations"]=msg              
-    #except:
+    except:
         debug("erreur dans recuperation_informations_home_perso")
     return HttpResponse(json.dumps(response_data), content_type="application/json")    
