@@ -428,7 +428,7 @@ def colloscope_semaine(request,id_menu,context):
             try:
                 context["lasemaine"]=semaine_en_cours().numero
             except:
-                context["lasemaine"]=0            
+                context["lasemaine"]=10            
             if not est_generic(request.user):
                 context["les_groupes"]=GroupeColles.objects.all()
             return render(request,'gestionmenu/colloscope_semaine.html',context)
