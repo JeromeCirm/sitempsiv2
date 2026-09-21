@@ -426,7 +426,7 @@ def colloscope_semaine(request,id_menu,context):
             lessemaines=Semaines.objects.all().order_by("numero")
             context["lessemaines"]=[{"numero":x.numero,"date":date_fr(x.date,True)} for x in lessemaines]
             try:
-                context["lasemaine"]=semaine_en_cours().numero
+                context["lasemaine"]=semaine_en_cours().numero+5
             except:
                 context["lasemaine"]=10            
             if not est_generic(request.user):
